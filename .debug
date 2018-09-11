@@ -1,0 +1,7 @@
+<ExtensionList>
+    <Extension Id="com.atomic.cep-boilerplate.panel">
+       <HostList>
+           <Host Name="ILST" Port="8088"/>
+        </HostList>
+    </Extension>
+</ExtensionList>
