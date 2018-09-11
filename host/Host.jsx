@@ -46,7 +46,7 @@ var Config = new Configuration({
     USER             : $.getenv('USER'),
     HOME             : $.getenv('HOME'),
     DOCUMENTS        : Folder.myDocuments,
-    LOGFOLDER        : Folder.myDocuments + '/logs/cep-boilerplate'
+    LOGFOLDER        : '~/Downloads/cep-boilerplate'
 });
 
 /**

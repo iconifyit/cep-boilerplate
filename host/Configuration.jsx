@@ -1,6 +1,33 @@
-var Configuration = function(CONFIG) {
+/**
+ * @author Scott Lewis <scott@atomiclotus.net>
+ * @copyright 2018 Scott Lewis
+ * @version 1.0.0
+ * @url http://github.com/iconifyit
+ * @url https://atomiclotus.net
+ *
+ * ABOUT:
+ *
+ *    This script is a basic Configuration object.
+ *
+ * NO WARRANTIES:
+ *
+ *   You are free to use, modify, and distribute this script as you see fit.
+ *   No credit is required but would be greatly appreciated.
+ *
+ *   THIS SCRIPT IS OFFERED AS-IS WITHOUT ANY WARRANTY OR GUARANTEES OF ANY KIND.
+ *   YOU USE THIS SCRIPT COMPLETELY AT YOUR OWN RISK AND UNDER NO CIRCUMSTANCES WILL
+ *   THE DEVELOPER AND/OR DISTRIBUTOR OF THIS SCRIPT BE HELD LIABLE FOR DAMAGES OF
+ *   ANY KIND INCLUDING LOSS OF DATA OR DAMAGE TO HARDWARE OR SOFTWARE. IF YOU DO
+ *   NOT AGREE TO THESE TERMS, DO NOT USE THIS SCRIPT.
+ */
+/**
+ * Creates a new Configuration option with the values from options.
+ * @param {Object} Options
+ * @constructor
+ */
+var Configuration = function(Options) {
 
-    var self = new Object();
+    this.values = {};
 
     /**
      * Get a value from an object or array.
@@ -9,9 +36,9 @@ var Configuration = function(CONFIG) {
      * @param   {*}               dfault
      * @returns {*}
      */
-    self.prototype.get = function( key, dfault ) {
+    this.get = function(key, dfault) {
         var value = dfault;
-        if (this.hasOwnProperty(key)) {
+        if (typeof(this.values[key]) != 'unedfined') {
             value = this[key];
         }
         return value;
@@ -24,8 +51,8 @@ var Configuration = function(CONFIG) {
      * @param   {*}               dfault
      * @returns {*}
      */
-    self.prototype.set = function( key, value ) {
-        this[key] = value;
+    this.set = function(key, value) {
+        this.values[key] = value;
     };
 
     /**
@@ -33,7 +60,7 @@ var Configuration = function(CONFIG) {
      * @param target
      * @param source
      */
-    self.prototype.extend = function(source) {
+    this.extend = function(source) {
         for (var key in source) {
             if (this.get(key, false)) {
                 continue;
@@ -48,23 +75,19 @@ var Configuration = function(CONFIG) {
      * @param {Object}  source      The source object with new values.
      * @param {Boolean} overwrite   Whether or not new values should replace old values.
      */
-    self.prototype.update = function(source, overwrite) {
+    this.update = function(source, overwrite) {
         if (typeof(overwrite) == undefined) {
             overwrite = true;
         }
         for (var key in source) {
-            if (this.hasOwnProperty(key)) {
+            if (typeof(this.values[key]) != 'unedfined') {
                 if (! overwrite && this.get(key, false)) {
                     continue;
                 }
-                this[key] = source[key];
+                this.values[key] = source[key];
             }
         }
     };
 
-    self.extend(CONFIG);
-
-    return self;
-
+    this.extend(Options);
 };
-

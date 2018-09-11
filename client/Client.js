@@ -40,20 +40,25 @@ $(function() {
      * @param text
      */
     Client.showMessage = function(text) {
-        var $message = $("#message");
-        var chars    = text.length;
-        var text     = $.trim(text);
-        var oldText  = $.trim($message.text());
+        try {
+            var $message = $("#message");
+            var chars    = text.length;
+            var text     = $.trim(text);
+            var oldText  = $.trim($message.text());
 
-        if (text == "") return;
-        if (strcmp(oldText, text)) return;
+            if (text == "") return;
+            if (strcmp(oldText, text)) return;
 
-        $message.text(text);
-        if (chars > 100) {
-            // In some cases, you might want to put sanity limits on message length.
+            $message.text(text);
+            if (chars > 100) {
+                // In some cases, you might want to put sanity limits on message length.
+            }
+
+            $message.show();
         }
-
-        $message.show();
+        catch(e) {
+            Client.error(e.message);
+        }
     };
 
     /**
@@ -73,6 +78,9 @@ $(function() {
      * @param data
      */
     Client.validate = function(result) {
+
+        Client.info("Validate : " + result);
+
         var data = JSON.parse(result);
 
         // Perform whatever validation is needed on the data here.
@@ -80,10 +88,10 @@ $(function() {
         if (typeof(data) != 'object') {
             throw "Host did not return a JSON object";
         }
-        if (typeof(data.value) == 'undefinied') {
+        else if (typeof(data.value) == 'undefinied') {
             throw "Host did not return a valid value";
         }
-        if ($.empty(data.value)) {
+        else if (isEmpty(data.value)) {
             throw "Host returned an empty value";
         }
 
@@ -97,24 +105,16 @@ $(function() {
      * Enabled a disabled element.
      * @param $o
      */
-    Client.enable = function(selector) {
-        var $o = selector;
-        if (typeof(sel) == 'string') {
-            $o = $(selector);
-        }
-        $o.removeAttr('disabled');
+    Client.enable = function(subject) {
+        $select(subject).removeAttr('disabled');
     };
 
     /**
      * Disable an eneabled element.
      * @param $o
      */
-    Client.disable = function(selector) {
-        var $o = selector;
-        if (typeof(sel) == 'string') {
-            $o = $(selector);
-        }
-        $o.attr('disabled', true);
+    Client.disable = function(subject) {
+        $select(subject).attr('disabled', '');
     };
 
     /**
@@ -137,18 +137,23 @@ $(function() {
         // call in a try/catch block to trap errors.
 
         try {
-            data = Client.validate(result);
+
+            if (typeof(result) != 'undefined') {
+                data = Client.validate(result);
+            }
 
             Client.clearMessage();
-            Client.showMessage(data);
+            Client.showMessage(data || "This is the first run");
 
             $open.mouseup(function() {
                 Client.jsxMethod("Open button clicked", Client.init);
+                Client.disable($open);
                 $open.blur();
             });
 
             $save.mouseup(function() {
                 Client.jsxMethod("Save button clicked", Client.init);
+                Client.disable($save);
                 $save.blur();
             });
         }
@@ -164,7 +169,7 @@ $(function() {
      * @param filePath
      */
     Client.jsxMethod = function(someData, theCallback) {
-        Client.eval('jsxCallback("' + someData + '")', theCallback);
+        csInterface.evalScript('jsxCallback("' + someData + '")', theCallback);
     };
 
     /**
@@ -207,8 +212,108 @@ $(function() {
         if (typeof(console[type]) == 'function') {
             console[type](message);
         }
-        Client.eval('csxLogger("' + message + '", "' + type + '")')
+        csInterface.evalScript('csxLogger("' + message + '", "' + type + '")')
     };
+
+    /**
+     * Flyout menu builder.
+     */
+    Client.initFlyoutMenu = function() {
+
+        // Flyout menu XML string
+        var flyoutXML = '<Menu> \
+							<MenuItem Id="enabledMenuItem" Label="Enabled Menu Item" Enabled="true" Checked="false"/> \
+							<MenuItem Id="disabledMenuItem" Label="Disabled Menu Item" Enabled="false" Checked="false"/> \
+							\
+							<MenuItem Label="---" /> \
+							\
+							<MenuItem Id="checkableMenuItem" Label="Checkable Menu Item" Enabled="true" Checked="true"/> \
+							\
+							<MenuItem Label="---" /> \
+							\
+							<MenuItem Id="actionMenuItem" Label="Click me to enable/disable the Target Menu!" Enabled="true" Checked="false"/> \
+							<MenuItem Id="targetMenuItem" Label="Target Menu Item" Enabled="true" Checked="false"/> \
+							\
+							<MenuItem Label="---" /> \
+							\
+							<MenuItem Label="Parent Menu (wont work on PS CC 2014.2.0)"> \
+								<MenuItem Label="Child Menu 1"/> \
+								<MenuItem Label="Child Menu 2"/> \
+							</MenuItem> \
+						</Menu>';
+
+        // Uses the XML string to build the menu
+        csInterface.setPanelFlyoutMenu(flyoutXML);
+        // themeManager.init();
+
+        // Listen for the Flyout menu clicks
+        csInterface.addEventListener("com.adobe.csxs.events.flyoutMenuClicked", Client.flyoutMenuClickedHandler);
+    };
+
+    /**
+     * Flyout menu click handler.
+     * @param event
+     */
+    Client.flyoutMenuClickedHandler = function(event) {
+
+        // Ugly workaround to keep track of "checked" and "enabled" statuses
+        var checkableMenuItem_isChecked = true;
+        var targetMenuItem_isEnabled = true;
+
+        // the event's "data" attribute is an object, which contains "menuId" and "menuName"
+        console.dir(event);
+        switch (event.data.menuId) {
+            case "checkableMenuItem":
+                checkableMenuItem_isChecked = !checkableMenuItem_isChecked;
+                csInterface.updatePanelMenuItem("Checkable Menu Item", true, checkableMenuItem_isChecked);
+                break;
+
+            case "actionMenuItem":
+                targetMenuItem_isEnabled = !targetMenuItem_isEnabled;
+                csInterface.updatePanelMenuItem("Target Menu Item", targetMenuItem_isEnabled, false);
+                break;
+
+            default:
+                console.log(event.data.menuName + " clicked!");
+        }
+
+        csInterface.evalScript("alert('Clicked!\\n \"" + event.data.menuName + "\"');");
+    };
+
+    /**
+     * Test if a value is empty.
+     * @param {*} data
+     * @returns {boolean}
+     */
+    function isEmpty(data) {
+        if (typeof(data) == 'number' || typeof(data) == 'boolean') {
+            return false;
+        }
+        if (typeof(data) == 'undefined' || data === null) {
+            return true;
+        }
+        if (typeof(data.length) != 'undefined') {
+            return data.length == 0;
+        }
+        var count = 0;
+        for (var i in data) {
+            if (data.hasOwnProperty(i)) count ++;
+        }
+        return count == 0;
+    }
+
+    /**
+     * Coerce any type of selector to the object it references, returned as a jQuery object.
+     * @param subject
+     * @returns {*}
+     */
+    function $select(subject) {
+        var $o = subject;
+        if (typeof(subject) != 'object') {
+            $o = $(subject);
+        }
+        return $o;
+    }
 
     /**
      * Case-insensitive string comparison.
@@ -222,6 +327,7 @@ $(function() {
 
     // Run now
 
-    Client.jsxMethod('jsxCallback("Initial Run")', Client.init);
-
+    Client.init();
+    Client.jsxMethod('Initial Run', Client.init);
+    Client.initFlyoutMenu();
 });
