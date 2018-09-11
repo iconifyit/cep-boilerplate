@@ -65,6 +65,9 @@ var Host = (function(Config) {
      */
     function _privateMethod(someData) {
 
+        // Write to the Host's logger output.
+        Host.logger.info(someData);
+
         // Do something cool.
         return JSON.stringify({
             "value": "The Host received the message : '" + someData + "'"
@@ -87,16 +90,3 @@ var Host = (function(Config) {
 
     // The closure takes the Configuration object as its argument.
 })(Config);
-
-/**
- * Get number of open documents.
- * @returns {*}
- */
-function jsxCallback(someData) {
-
-    // Write to the Host's logger output.
-    Host.logger.info(someData);
-
-    // Call the Host's public method.
-    return Host.publicMethod(someData);
-}

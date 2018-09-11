@@ -146,13 +146,13 @@ $(function() {
             Client.showMessage(data || "This is the first run");
 
             $open.mouseup(function() {
-                Client.jsxMethod("Open button clicked", Client.init);
+                Client.hostMethod("Open button clicked", Client.init);
                 Client.disable($open);
                 $open.blur();
             });
 
             $save.mouseup(function() {
-                Client.jsxMethod("Save button clicked", Client.init);
+                Client.hostMethod("Save button clicked", Client.init);
                 Client.disable($save);
                 $save.blur();
             });
@@ -168,8 +168,8 @@ $(function() {
      * Call the csInterface to open session.
      * @param filePath
      */
-    Client.jsxMethod = function(someData, theCallback) {
-        csInterface.evalScript('jsxCallback("' + someData + '")', theCallback);
+    Client.hostMethod = function(someData, theCallback) {
+        csInterface.evalScript('Host.publicMethod("' + someData + '")', theCallback);
     };
 
     /**
@@ -328,6 +328,6 @@ $(function() {
     // Run now
 
     Client.init();
-    Client.jsxMethod('Initial Run', Client.init);
+    Client.hostMethod('Initial Run', Client.init);
     Client.initFlyoutMenu();
 });
