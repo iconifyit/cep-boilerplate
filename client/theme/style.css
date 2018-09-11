@@ -1,0 +1,72 @@
+/**
+ * @author Scott Lewis <scott@atomiclotus.net>
+ * @copyright 2018 Scott Lewis
+ * @version 1.0.0
+ * @url http://github.com/iconifyit
+ * @url https://atomiclotus.net
+ *
+ * ABOUT:
+ *
+ *    This script saves a list of open Illustrator documents for you to easily
+ *    return to this work 'session' at a later time without searching for all
+ *    of your open documents.
+ *
+ * NO WARRANTIES:
+ *
+ *   You are free to use, modify, and distribute this script as you see fit.
+ *   No credit is required but would be greatly appreciated.
+ *
+ *   THIS SCRIPT IS OFFERED AS-IS WITHOUT ANY WARRANTY OR GUARANTEES OF ANY KIND.
+ *   YOU USE THIS SCRIPT COMPLETELY AT YOUR OWN RISK AND UNDER NO CIRCUMSTANCES WILL
+ *   THE DEVELOPER AND/OR DISTRIBUTOR OF THIS SCRIPT BE HELD LIABLE FOR DAMAGES OF
+ *   ANY KIND INCLUDING LOSS OF DATA OR DAMAGE TO HARDWARE OR SOFTWARE. IF YOU DO
+ *   NOT AGREE TO THESE TERMS, DO NOT USE THIS SCRIPT.
+ */
+@charset "utf-8";
+/* CSS Document */
+
+body {
+    background-color: #535353;
+    padding: 10px;
+    overflow: hidden;
+}
+
+select#sessions {
+    width: 100%;
+}
+
+body div,
+body select {
+
+}
+
+section {
+    padding: 15px 0;
+}
+
+section.messages {
+
+}
+
+#message {
+    color: #ccc;
+    font-size: 1em;
+}
+
+section.content {
+    padding: 0;
+}
+
+section.buttons {
+    padding-top: 8px;
+}
+
+.hidden {
+    display: none;
+}
+
+option {
+    padding: 2px 10px;
+    border-bottom: 1px solid #ccc;
+    font-size: 1.1em;
+}
