@@ -34,15 +34,15 @@
                     <Menu>CEP Boilderplate</Menu>
                     <Geometry>
                         <Size>
-                            <Height>430</Height>
+                            <Height>250</Height>
                             <Width>350</Width>
                         </Size>
                         <MaxSize>
-                            <Height>430</Height>
+                            <Height>250</Height>
                             <Width>350</Width>
                         </MaxSize>
                         <MinSize>
-                            <Height>430</Height>
+                            <Height>250</Height>
                             <Width>350</Width>
                         </MinSize>
                     </Geometry>

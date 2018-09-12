@@ -27,6 +27,10 @@ $(function() {
 
     var csInterface = new CSInterface();
 
+    // Ugly workaround to keep track of "checked" and "enabled" statuses
+    var checkableMenuItem_isChecked = true;
+    var targetMenuItem_isEnabled    = true;
+
     /**
      * Eval a script to run in the JSX host app.
      * @param theScript
@@ -219,35 +223,15 @@ $(function() {
      * Flyout menu builder.
      */
     Client.initFlyoutMenu = function() {
-
-        // Flyout menu XML string
-        var flyoutXML = '<Menu> \
-							<MenuItem Id="enabledMenuItem" Label="Enabled Menu Item" Enabled="true" Checked="false"/> \
-							<MenuItem Id="disabledMenuItem" Label="Disabled Menu Item" Enabled="false" Checked="false"/> \
-							\
-							<MenuItem Label="---" /> \
-							\
-							<MenuItem Id="checkableMenuItem" Label="Checkable Menu Item" Enabled="true" Checked="true"/> \
-							\
-							<MenuItem Label="---" /> \
-							\
-							<MenuItem Id="actionMenuItem" Label="Click me to enable/disable the Target Menu!" Enabled="true" Checked="false"/> \
-							<MenuItem Id="targetMenuItem" Label="Target Menu Item" Enabled="true" Checked="false"/> \
-							\
-							<MenuItem Label="---" /> \
-							\
-							<MenuItem Label="Parent Menu (wont work on PS CC 2014.2.0)"> \
-								<MenuItem Label="Child Menu 1"/> \
-								<MenuItem Label="Child Menu 2"/> \
-							</MenuItem> \
-						</Menu>';
-
-        // Uses the XML string to build the menu
-        csInterface.setPanelFlyoutMenu(flyoutXML);
-        // themeManager.init();
-
-        // Listen for the Flyout menu clicks
-        csInterface.addEventListener("com.adobe.csxs.events.flyoutMenuClicked", Client.flyoutMenuClickedHandler);
+        var Menu = new FlyoutMenu();
+        Menu.add('enabledMenuItem',   'Enabled Menu Item', true, false, false);
+        Menu.add('disabledMenuItem',  'Disabled Menu Item', false, false, false);
+        Menu.divider();
+        Menu.add('checkableMenuItem', 'Yo, check it', true, true, true);
+        Menu.add('actionMenuItem',    'Click to toggle the target', true, false, false);
+        Menu.add('targetMenuItem',    'I am the target', true, false, false);
+        Menu.setHandler(Client.flyoutMenuClickedHandler);
+        Menu.build();
     };
 
     /**
@@ -256,26 +240,24 @@ $(function() {
      */
     Client.flyoutMenuClickedHandler = function(event) {
 
-        // Ugly workaround to keep track of "checked" and "enabled" statuses
-        var checkableMenuItem_isChecked = true;
-        var targetMenuItem_isEnabled = true;
-
         // the event's "data" attribute is an object, which contains "menuId" and "menuName"
-        console.dir(event);
+
         switch (event.data.menuId) {
             case "checkableMenuItem":
                 checkableMenuItem_isChecked = !checkableMenuItem_isChecked;
-                csInterface.updatePanelMenuItem("Checkable Menu Item", true, checkableMenuItem_isChecked);
+                csInterface.updatePanelMenuItem("Yo, check it", true, checkableMenuItem_isChecked);
                 break;
 
             case "actionMenuItem":
                 targetMenuItem_isEnabled = !targetMenuItem_isEnabled;
-                csInterface.updatePanelMenuItem("Target Menu Item", targetMenuItem_isEnabled, false);
+                csInterface.updatePanelMenuItem("I am the target", targetMenuItem_isEnabled, false);
                 break;
 
             default:
-                console.log(event.data.menuName + " clicked!");
+                break;
         }
+
+        console.log(event.data.menuName + " clicked!");
 
         csInterface.evalScript("alert('Clicked!\\n \"" + event.data.menuName + "\"');");
     };
