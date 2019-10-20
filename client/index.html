@@ -35,26 +35,52 @@
         <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
         <!-- /Topcoat -->
         <link rel="stylesheet" href="theme/style.css">
-    </head>
-    <body>
-        <section class="messages">
-            <div id="message" class="info"></div>
-        </section>
-        <section class="content">
 
-        </section>
-        <section class="buttons">
-            <button id="open-button" class="topcoat-button--large--cta" disabled>Open</button>
-            <button id="save-button" class="topcoat-button--large">Save</button>
-        </section>
+        <script>
+            console.log('test', typeof cep_node);
+            console.log('test', typeof require);
+        </script>
+    </head>
+    <body style="height: 250px; width: 350px; min-height: 250px; min-width: 350px;" onresize="return false;">
+        <div id="wrapper" style="height: 100vh; width: 100vw;">
+            <section class="messages">
+                <div id="message" class="info"></div>
+            </section>
+            <section class="content">
+
+            </section>
+            <section class="buttons">
+                <button id="open-button" class="topcoat-button--large--cta" disabled>Open</button>
+                <button id="save-button" class="topcoat-button--large">Save</button>
+            </section>
+        </div>
         <!--scripts-->
-        <script>if (typeof module === 'object')  { window.module = module; module = undefined; }</script>
+        <script>if (typeof module  === 'object') { window.module = module; module = undefined;    }</script>
         <script>if (typeof exports === 'object') { window.exports = exports; exports = undefined; }</script>
-        <script src="lib/CSInterface.js"></script>
-        <script src="lib/jquery.3.3.1.min.js"></script>
-        <script src="lib/FlyoutMenu.js"></script>
+
+        <script src="lib/CSInterface/CSInterface.js"></script>
+        <script src="lib/jQuery/jquery.3.3.1.min.js"></script>
+        <script src="lib/FlyoutMenu/FlyoutMenu.js"></script>
         <script src="Client.js"></script>
-        <script>if (window.module) module = window.module;</script>
+
+        <script>
+
+            // const func = {
+            //     foo : new String(''),
+            //     bar : new Number(1)
+            // };
+            //
+            // require(__dirname + '/host/polyfills');
+            //
+            // console.log('Object.update', Object.keys);
+            //
+            // const csInterface = require(__dirname + '/client/lib/CSInterface');
+            // const jQuery      = require(__dirname + '/client/lib/jQuery');
+            // const FlyoutMenu  = require(__dirname + '/client/lib/FlyoutMenu');
+            // const Client      = require(__dirname + '/client/Client');
+        </script>
+
+        <script>if (window.module)  module  = window.module;</script>
         <script>if (window.exports) exports = window.exports;</script>
     </body>
 </html>

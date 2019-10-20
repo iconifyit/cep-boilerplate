@@ -34,6 +34,8 @@
  */
 var Iterator = function(items) {
 
+    "use strict";
+
     /**
      * The object prototype. Properties and method shared by all instances of Iterator.
      */
@@ -335,3 +337,5 @@ var Iterator = function(items) {
 
     return this.prototype;
 };
+
+module.exports = Iterator;

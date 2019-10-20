@@ -21,10 +21,6 @@
  *   NOT AGREE TO THESE TERMS, DO NOT USE THIS SCRIPT.
  */
 
-if (typeof(csInterface) != 'object') {
-    csInterface = new CSInterface();
-}
-
 /**
  * Create a new FlyoutMenu.
  * @param {array}  menuItems An array of MenuItems each having ID, Label, enabled, checked.
@@ -33,17 +29,22 @@ if (typeof(csInterface) != 'object') {
  */
 function FlyoutMenu() {
 
+    "use strict";
+
     /**
      * The root menu.
      * @type {jQuery|HTMLElement}
      */
-    var Menu = [];
+    var Menu = {
+        state : {},
+        items : []
+    };
 
     /**
      * Add a divider item.
      */
     this.divider = function() {
-        Menu.push(MenuDivider());
+        Menu.items.push(MenuDivider());
     }
 
     /**
@@ -54,8 +55,21 @@ function FlyoutMenu() {
      * @param checked
      */
     this.add = function(id, label, enabled, checked) {
-        Menu.push(MenuItem(id, label, enabled, checked));
+        Menu.items.push(MenuItem(id, label, enabled, checked));
+        Menu.state[id] = {
+            enabled : enabled,
+            checked : checked,
+            text    : label
+        };
     };
+
+    /**
+     * Get the Menu state object.
+     * @returns {*}
+     */
+    this.getState = function() {
+        return Menu.state;
+    }
 
     /**
      * Set the menu click handler.
@@ -70,7 +84,7 @@ function FlyoutMenu() {
      * @returns {*|jQuery}
      */
     this.toString = function() {
-        return "<Menu>\n" + Menu.join('\n') + "\n</Menu>\n";
+        return "<Menu>\n" + Menu.items.join('\n') + "\n</Menu>\n";
     }
 
     /**
@@ -114,4 +128,10 @@ function MenuItem(id, label, enabled, checked) {
  */
 function MenuDivider() {
     return '<MenuItem Label="---" />';
+}
+
+var flyoutMenu = new FlyoutMenu();
+
+if (module) {
+    module.exports = flyoutMenu;
 }

@@ -27,6 +27,8 @@
  */
 var Configuration = function(Options) {
 
+    "use strict";
+
     this.values = {};
 
     /**
@@ -91,3 +93,5 @@ var Configuration = function(Options) {
 
     this.extend(Options);
 };
+
+module.exports = Configuration;

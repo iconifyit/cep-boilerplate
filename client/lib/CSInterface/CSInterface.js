@@ -1191,3 +1191,10 @@ CSInterface.prototype.getWindowTitle = function()
 {
     return window.__adobe_cep__.invokeSync("getWindowTitle", "");
 };
+
+var csInterface = new CSInterface();
+
+if (module) {
+    module.exports = csInterface;
+}
+

@@ -20,18 +20,16 @@
  *   ANY KIND INCLUDING LOSS OF DATA OR DAMAGE TO HARDWARE OR SOFTWARE. IF YOU DO
  *   NOT AGREE TO THESE TERMS, DO NOT USE THIS SCRIPT.
  */
-
+var module = typeof module === 'undefined' ? {} : module;
 /**
  * Declare the target app.
  */
-#target illustrator
-
-$.localize = true;
 
 #include "Logger.jsx"
 #include "JSON.jsx"
 #include "Utils.jsx"
 #include "Configuration.jsx";
+
 
 /**
  * @type {{
@@ -45,20 +43,27 @@ var Config = new Configuration({
     APP_NAME         : 'cep-boilerplate',
     USER             : $.getenv('USER'),
     HOME             : $.getenv('HOME'),
-    DOCUMENTS        : Folder.myDocuments,
+    DOCUMENTS        : '~/Documents',
     LOGFOLDER        : '~/Downloads/cep-boilerplate'
 });
 
 /**
+ * The local scope logger object.
+ * @type {Logger}
+ */
+var logger = new Logger(Config.get('APP_NAME'), Config.get('LOGFOLDER'));
+
+function debug(what) {
+    logger.info(what);
+    alert(what);
+}
+
+debug('Logger instance created');
+
+/**
  * Run the script using the Module patter.
  */
-var Host = (function(Config) {
-
-    /**
-     * The local scope logger object.
-     * @type {Logger}
-     */
-    var _logger = new Logger(Config.get('APP_NAME'), Config.get('LOGFOLDER'));
+var Host = (function(Config, logger) {
 
     /**
      * Private, local function.
@@ -66,27 +71,53 @@ var Host = (function(Config) {
     function _privateMethod(someData) {
 
         // Write to the Host's logger output.
-        Host.logger.info(someData);
+        debug(someData);
 
         // Do something cool.
-        return JSON.stringify({
-            "value": "The Host received the message : '" + someData + "'"
+
+        var result = JSON.stringify({
+            "value": "The Host received the message : " + someData
         });
+
+        debug(result);
+
+        return result;
     };
+
+    alert('Host created');
 
     /**
      * Public object.
      */
     return {
-        logger: _logger,
+        logger: logger,
         /**
          * Public function.
          * @returns {*}
          */
         publicMethod: function(someData) {
+            debug('Call Host.publicMethod');
             return _privateMethod(someData);
         }
     }
 
     // The closure takes the Configuration object as its argument.
-})(Config);
+})(Config, logger);
+
+debug('Host file loaded');
+
+/**
+ * Use this to interface from client side.
+ * Example: csxScript('log("some text", "info")')
+ * @param message
+ * @param type
+ */
+function csxLogger(message, type) {
+    try {
+        logger.info( message );
+        return 'ok';
+    }
+    catch(e) {
+        return e;
+    }
+}

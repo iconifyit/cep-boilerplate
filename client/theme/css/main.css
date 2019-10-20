@@ -7,6 +7,9 @@ body {
   font-family: source-sans-pro, sans-serif;
   position: relative;
   -webkit-font-smoothing: antialiased;
+
+  height : 100vh;
+  width  : 100vw;
 }
 body.light {
   background: #F4F4F4;
@@ -331,7 +334,7 @@ select.docNav {
   }
   #main-header nav li.selected a {
     color: #373435;
-  } 
+  }
   #slide-menu-button{
     display: none;
   }

@@ -10,6 +10,10 @@
     <ExecutionEnvironment>
         <HostList>
             <Host Name="ILST" Version="19" />
+            <Host Name="PHXS" Version="14.0"/>
+            <Host Name="PHSP" Version="14.0"/>
+            <Host Name="IDSN" Version="9.0"/>
+            <Host Name="AEFT" Version="13.0"/>
         </HostList>
         <LocaleList>
             <Locale Code="All" />
@@ -24,14 +28,17 @@
                 <Resources>
                     <MainPath>./client/index.html</MainPath>
                     <ScriptPath>./host/Host.jsx</ScriptPath>
-                    <CEFCommandLine/>
+                    <CEFCommandLine>
+                        <Parameter>--enable-nodejs</Parameter>
+                        <Parameter>--mixed-context</Parameter>
+                    </CEFCommandLine>
                 </Resources>
                 <Lifecycle>
                     <AutoVisible>true</AutoVisible>
                 </Lifecycle>
                 <UI>
                     <Type>Panel</Type>
-                    <Menu>CEP Boilderplate</Menu>
+                    <Menu>Boilerplate</Menu>
                     <Geometry>
                         <Size>
                             <Height>250</Height>

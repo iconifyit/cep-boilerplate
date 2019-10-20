@@ -23,31 +23,31 @@
  *
  */
 
-var Progress = {
+var ProgressBar = {
 
 	top: 0,
-	
+
 	left: 0,
-	
+
 	width: 450,
-	
+
 	height: 100,
-	
+
 	minvalue: 0,
-	
+
 	maxvalue: 100,
-	
+
 	window: null,
-	
+
 	panel: null,
-	
+
 	init: function(start, end) {
-	
+
 		Progress.minvalue = start;
 		Progress.maxvalue = end;
 
 		var top, right, bottom, left;
-		
+
 		Progress.top = 0;
 		Progress.left = 0;
 		Progress.width = 450;
@@ -59,36 +59,36 @@ var Progress = {
 		}
 
 		Progress.window = new Window(
-			'palette', 
-			'Progress', 
+			'palette',
+			'Progress',
 			[left, top, left + Progress.width, top + Progress.height]
 		);
-		
+
 		Progress.window.pnl = progress.add(
-			'panel', 
-			[10, 10, 440, 100], 
+			'panel',
+			[10, 10, 440, 100],
 			'Progress'
 		);
-		
+
 		Progress.window.pnl.progBar = progress.pnl.add(
-			'progressbar', 
-			[20, 35, 410, 60], 
-			0, 
+			'progressbar',
+			[20, 35, 410, 60],
+			0,
 			Progress.maxvalue
 		);
-		
+
 		Progress.window.pnl.progBarLabel = progress.pnl.add(
-			'statictext', 
-			[20, 20, 320, 35], 
+			'statictext',
+			[20, 20, 320, 35],
 			"0 of " + Progress.maxvalue
 		);
 	},
-	
+
     show: function() {
         try { Progress.close(); } catch(e){};
 		Progress.obj.show();
     },
-    
+
     update: function() {
     	Progress.window.pnl.progBar.value++;
 		var val = Progress.window.pnl.progBar.value;
@@ -97,8 +97,10 @@ var Progress = {
 		$.sleep(10);
 		Progress.window.update();
     },
-    
+
     close: function() {
     	Progress.window.close();
     }
 };
+
+module.exports = ProgressBar;

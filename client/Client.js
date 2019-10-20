@@ -20,22 +20,22 @@
  *   ANY KIND INCLUDING LOSS OF DATA OR DAMAGE TO HARDWARE OR SOFTWARE. IF YOU DO
  *   NOT AGREE TO THESE TERMS, DO NOT USE THIS SCRIPT.
  */
+var Client = (($, csInterface, console) => {
 
-window.Client = window.Client || {};
-
-$(function() {
-
-    var csInterface = new CSInterface();
+    var Instance = {};
 
     // Ugly workaround to keep track of "checked" and "enabled" statuses
     var checkableMenuItem_isChecked = true;
     var targetMenuItem_isEnabled    = true;
 
+    Instance.flyoutMenu = {state: []};
+    Instance.menuState = {};
+
     /**
      * Eval a script to run in the JSX host app.
      * @param theScript
      */
-    Client.eval = function(theScript) {
+    Instance.eval = function(theScript) {
         csInterface.evalScript(theScript);
     };
 
@@ -43,7 +43,11 @@ $(function() {
      * Show a message in #message element.
      * @param text
      */
-    Client.showMessage = function(text) {
+    Instance.showMessage = function(text) {
+        try {
+            Instance.clearMessage();
+        } catch(e) {}
+
         try {
             var $message = $("#message");
             var chars    = text.length;
@@ -59,16 +63,18 @@ $(function() {
             }
 
             $message.show();
+
+            console.log(text);
         }
         catch(e) {
-            Client.error(e.message);
+            Instance.error(e.message);
         }
     };
 
     /**
      * Clears and hides the palette message block.
      */
-    Client.clearMessage = function() {
+    Instance.clearMessage = function() {
         var $message = $("#message");
         $message.text("");
         $message.hide();
@@ -81,9 +87,9 @@ $(function() {
      * as a common format between Host and Client.
      * @param data
      */
-    Client.validate = function(result) {
+    Instance.validate = function(result) {
 
-        Client.info("Validate : " + result);
+        Instance.info("Validate : " + result);
 
         var data = JSON.parse(result);
 
@@ -109,7 +115,7 @@ $(function() {
      * Enabled a disabled element.
      * @param $o
      */
-    Client.enable = function(subject) {
+    Instance.enable = function(subject) {
         $select(subject).removeAttr('disabled');
     };
 
@@ -117,7 +123,7 @@ $(function() {
      * Disable an eneabled element.
      * @param $o
      */
-    Client.disable = function(subject) {
+    Instance.disable = function(subject) {
         $select(subject).attr('disabled', '');
     };
 
@@ -125,7 +131,7 @@ $(function() {
      * Initialize the HTML UI or update with result from a JSX script callback.
      * @param {*} result
      */
-    Client.init = function(result) {
+    Instance.init = function(result) {
 
         var $message = $("#message");
         var $open    = $("#open-button");
@@ -134,7 +140,7 @@ $(function() {
 
         // Example enabling a disabled button.
 
-        Client.enable($open);
+        Instance.enable($open);
 
         // Client validate should throw an error if the validation fails,
         // or return the expected data if it passes. Wrap the validation
@@ -142,29 +148,38 @@ $(function() {
 
         try {
 
-            if (typeof(result) != 'undefined') {
-                data = Client.validate(result);
+            if (typeof(result) !== 'undefined') {
+                data = Instance.validate(result);
             }
 
-            Client.clearMessage();
-            Client.showMessage(data || "This is the first run");
+            Instance.showMessage(data || "This is the first run");
 
-            $open.mouseup(function() {
-                Client.hostMethod("Open button clicked", Client.init);
-                Client.disable($open);
+            var openHandler = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                Instance.hostMethod("Open button clicked", Client.showMessage);
+                // Instance.disable($open);
                 $open.blur();
-            });
+            }
 
-            $save.mouseup(function() {
-                Client.hostMethod("Save button clicked", Client.init);
-                Client.disable($save);
+            var saveHandler = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                Instance.hostMethod("Save button clicked", Client.showMessage);
+                // Instance.disable($save);
                 $save.blur();
-            });
+            }
+
+            $open.off('click', openHandler).click(openHandler);
+            $save.off('click', saveHandler).click(saveHandler);
         }
         catch(e) {
             // Handle the error however you need to.
-            Client.error(message);
-            Client.showMessage(e.message);
+            Instance.error(message);
+            // Instance.showMessage(e.message);
+            // console.error('Client Instance error', e);
         }
     };
 
@@ -172,7 +187,7 @@ $(function() {
      * Call the csInterface to open session.
      * @param filePath
      */
-    Client.hostMethod = function(someData, theCallback) {
+    Instance.hostMethod = function(someData, theCallback) {
         csInterface.evalScript('Host.publicMethod("' + someData + '")', theCallback);
     };
 
@@ -180,40 +195,41 @@ $(function() {
      * Send error message to log via CSInterface.
      * @param message
      */
-    Client.error = function(message) {
-        Client.log(message, 'error');
+    Instance.error = function(message) {
+        Instance.log(message, 'error');
     };
 
     /**
      * Send info message to log via CSInterface.
      * @param message
      */
-    Client.info = function(message) {
-        Client.log(message, 'info');
+    Instance.info = function(message) {
+        Instance.log(message, 'info');
     };
 
     /**
      * Send success message to log via CSInterface.
      * @param message
      */
-    Client.success = function(message) {
-        Client.log(message, 'success');
+    Instance.success = function(message) {
+        Instance.log(message, 'success');
     };
 
     /**
      * Send warning message to log via CSInterface.
      * @param message
      */
-    Client.warn = function(message) {
-        Client.log(message, 'warn');
+    Instance.warn = function(message) {
+        Instance.log(message, 'warn');
     };
 
     /**
      * Log a message to the client console and the host logger.
      * @param message
      */
-    Client.log = function(message, type) {
-        if (typeof(console[type]) == 'function') {
+    Instance.log = function(message, type) {
+        if (type === undefined) type = 'info';
+        if (typeof(console[type]) === 'function') {
             console[type](message);
         }
         csInterface.evalScript('csxLogger("' + message + '", "' + type + '")')
@@ -222,45 +238,77 @@ $(function() {
     /**
      * Flyout menu builder.
      */
-    Client.initFlyoutMenu = function() {
-        var Menu = new FlyoutMenu();
-        Menu.add('enabledMenuItem',   'Enabled Menu Item', true, false, false);
-        Menu.add('disabledMenuItem',  'Disabled Menu Item', false, false, false);
-        Menu.divider();
-        Menu.add('checkableMenuItem', 'Yo, check it', true, true, true);
-        Menu.add('actionMenuItem',    'Click to toggle the target', true, false, false);
-        Menu.add('targetMenuItem',    'I am the target', true, false, false);
-        Menu.setHandler(Client.flyoutMenuClickedHandler);
-        Menu.build();
+    Instance.initFlyoutMenu = function() {
+        var flyoutMenu = new FlyoutMenu();
+        flyoutMenu.add('enabledMenuItem',   'Enabled Menu Item', true, false, false);
+        flyoutMenu.add('disabledMenuItem',  'Disabled Menu Item', false, false, false);
+        flyoutMenu.divider();
+        flyoutMenu.add('checkableMenuItem', 'Yo, check it', true, true, true);
+        flyoutMenu.add('actionMenuItem',    'Click to toggle the target', true, false, false);
+        flyoutMenu.add('targetMenuItem',    'I am the target', true, false, false);
+        flyoutMenu.add('reloadExtension',   'Reload Extension', true, false, false);
+        flyoutMenu.setHandler(Instance.flyoutMenuClickedHandler);
+        flyoutMenu.build();
+
+        Instance.menuState = flyoutMenu.getState();
+
+        console.log('flyoutMenu', flyoutMenu);
+        console.log('flyoutMenu.state', Instance.menuState);
     };
 
     /**
      * Flyout menu click handler.
      * @param event
      */
-    Client.flyoutMenuClickedHandler = function(event) {
+    Instance.flyoutMenuClickedHandler = (function(console) {
+        return function(event) {
+            try {
 
-        // the event's "data" attribute is an object, which contains "menuId" and "menuName"
+                var menuId = event.data.menuId;
 
-        switch (event.data.menuId) {
-            case "checkableMenuItem":
-                checkableMenuItem_isChecked = !checkableMenuItem_isChecked;
-                csInterface.updatePanelMenuItem("Yo, check it", true, checkableMenuItem_isChecked);
-                break;
+                var itemState;
 
-            case "actionMenuItem":
-                targetMenuItem_isEnabled = !targetMenuItem_isEnabled;
-                csInterface.updatePanelMenuItem("I am the target", targetMenuItem_isEnabled, false);
-                break;
+                if (Instance.menuState[menuId]) {
+                    itemState = Instance.menuState[menuId];
+                }
 
-            default:
-                break;
+                Instance.log(menuId + ' clicked', 'info');
+
+                switch (menuId) {
+                    case "checkableMenuItem":
+                        itemState.checked = ! itemState.checked;
+                        csInterface.updatePanelMenuItem("Yo, check it", true, itemState.checked);
+                        break;
+
+                    case "actionMenuItem":
+                        itemState.enabled = ! itemState.enabled;
+                        csInterface.updatePanelMenuItem("I am the target", itemState.enabled, false);
+                        break;
+
+                    case "reloadExtension":
+                        reloadExtension();
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            catch(e) { alert(e) }
         }
+    })(console);
 
-        console.log(event.data.menuName + " clicked!");
-
-        csInterface.evalScript("alert('Clicked!\\n \"" + event.data.menuName + "\"');");
-    };
+    /**
+     * Reload the index.html
+     */
+    function reloadExtension() {
+        try {
+            window.cep.process.removeAllListeners();
+            window.location.href = "index.html";
+        }
+        catch (e) {
+            window.location.href = "index.html";
+        }
+    }
 
     /**
      * Test if a value is empty.
@@ -309,7 +357,14 @@ $(function() {
 
     // Run now
 
-    Client.init();
-    Client.hostMethod('Initial Run', Client.init);
-    Client.initFlyoutMenu();
-});
+    Instance.init();
+    Instance.initFlyoutMenu();
+    //Instance.hostMethod('Initial Run', Client.init);
+
+    return Instance;
+
+})(jQuery, csInterface, console);
+
+if (typeof exports !== 'undefined') {
+    exports.Client = Client;
+}

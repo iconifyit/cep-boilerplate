@@ -824,3 +824,78 @@ Utils.showInFinder = function(thePath) {
         alert(e);
     }
 };
+
+/**
+ * Split single paths into individual path commands.
+ * @param paths
+ * @returns {Array}
+ */
+Utils.splitSvgPath = function(paths) {
+
+    var splitPaths = [];
+
+    if (! (paths instanceof Array)) {
+        paths = [paths];
+    }
+
+    paths.map(function(path) {
+        var commands = path.split('M')
+        commands.shift()
+        splitPaths = splitPaths.concat(commands)
+    })
+
+    splitPaths.map(function(path) {
+        return "M " + path;
+    })
+
+    return splitPaths;
+}
+
+/*
+  M = moveto
+  L = lineto
+  H = horizontal lineto
+  V = vertical lineto
+  C = curveto
+  S = smooth curveto
+  Q = quadratic Bézier curve
+  T = smooth quadratic Bézier curveto
+  A = elliptical Arc
+  Z = closepath
+
+  Example:
+
+        M1.5,9.744l10.5-9l10.5,9
+        M12,5.244L3.377,12.61C3.153,12.818,3.018,13.105,3,13.41v8.855 c0.002,0.539,0.439,0.976,0.978,0.978H9.75
+        v-7.01c0.001-0.27,0.219-0.489,0.489-0.49h3.522c0.27,0.001,0.488,0.22,0.489,0.49 v7.01
+         h5.772c0.539-0.002,0.976-0.438,0.978-0.977v-8.855c-0.018-0.305-0.153-0.592-0.377-0.8L12,5.244z
+*/
+
+/**
+ * Tokenize a string.
+ * @param   {string}    str
+ * @param   {Array}     tokens
+ * @returns {Array}
+ */
+Utils.tokenize = function(str, tokens) {
+
+    var s,
+        peek,
+        commands = [];
+
+    str = str.trim()
+
+    for (var index = 0; index < str.length; index++) {
+
+        s += str[index];
+        peek = str[index + 1]
+
+        if (tokens.indexOf(peek) !== -1) {
+            commands.push(s.trim());
+            s = ''
+        }
+    }
+    return commands;
+}
+
+module.exports = Utils;

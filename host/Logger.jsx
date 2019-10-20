@@ -26,14 +26,20 @@
  * @param folder
  * @constructor
  */
-function Logger(name, folder) {
+var Logger = function(name, folder) {
+
+    var myDocuments;
+
+    if (Folder && Folder.myDocuments && Folder.myDocuments.absoluteURI) {
+        myDocuments = Folder.myDocuments.absoluteURI;
+    }
 
     /**
      * Default settings for the logger.
      * @type {{folder: string}}
      */
     this.defaults = {
-        folder: Folder.myDocuments + "/logs"
+        folder: myDocuments + "/logs"
     }
 
     /**
@@ -175,3 +181,5 @@ Logger.prototype = {
         }
     }
 };
+
+module.exports = Logger;
