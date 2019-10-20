@@ -22,116 +22,114 @@
  */
 var Client = (($, csInterface, console) => {
 
-    var Instance = {};
+    var Instance = function() {
 
-    // Ugly workaround to keep track of "checked" and "enabled" statuses
-    var checkableMenuItem_isChecked = true;
-    var targetMenuItem_isEnabled    = true;
-
-    Instance.flyoutMenu = {state: []};
-    Instance.menuState = {};
+        this.flyoutMenu = {state: []};
+        this.menuState = {};
+    }
 
     /**
      * Eval a script to run in the JSX host app.
      * @param theScript
      */
-    Instance.eval = function(theScript) {
+    Instance.prototype.eval = function(theScript) {
         csInterface.evalScript(theScript);
-    };
+    }
 
     /**
      * Show a message in #message element.
      * @param text
      */
-    Instance.showMessage = function(text) {
+    Instance.prototype.showMessage = function(text) {
         try {
-            Instance.clearMessage();
+            this.clearMessage();
         } catch(e) {}
 
         try {
             var $message = $("#message");
-            var chars    = text.length;
             var text     = $.trim(text);
             var oldText  = $.trim($message.text());
 
-            if (text == "") return;
+            if (text === "") return;
             if (strcmp(oldText, text)) return;
 
             $message.text(text);
-            if (chars > 100) {
-                // In some cases, you might want to put sanity limits on message length.
-            }
-
             $message.show();
 
             console.log(text);
         }
         catch(e) {
-            Instance.error(e.message);
+            this.error(e.message);
         }
-    };
+    }
 
     /**
      * Clears and hides the palette message block.
      */
-    Instance.clearMessage = function() {
+    Instance.prototype.clearMessage = function() {
         var $message = $("#message");
         $message.text("");
         $message.hide();
-    };
+    }
+
+    /**
+     * Show the Host response.
+     * @param response
+     */
+    Instance.prototype.feedback = function(response) {
+        this.showMessage( this.validate(response) );
+    }
 
     /**
      * Method to validate the data returned from a JSX callback
      * to make sure it is in the expected format. All results are
      * returned as a string. I recommend using stringified JSON
      * as a common format between Host and Client.
+     *
+     * To make sure the return value is predictable, use:
+     *
+     *     JSON.stringify({value : 'Your return value', error: 'If there is an error'});
+     *
      * @param data
      */
-    Instance.validate = function(result) {
+    Instance.prototype.validate = function(result) {
+        try {
+            var hostResponse = new HostResponse().parse(result);
 
-        Instance.info("Validate : " + result);
+            if (hostResponse.isError()) {
+                return hostResponse.getError();
+            }
 
-        var data = JSON.parse(result);
-
-        // Perform whatever validation is needed on the data here.
-
-        if (typeof(data) != 'object') {
-            throw "Host did not return a JSON object";
+            return hostResponse.getValue();
         }
-        else if (typeof(data.value) == 'undefinied') {
-            throw "Host did not return a valid value";
+        catch(e) {
+            return e.message;
         }
-        else if (isEmpty(data.value)) {
-            throw "Host returned an empty value";
-        }
-
-        // Validation passed, return the data value.
-        // I am returning a single value from the JSON
-        // object but you can return the whole object.
-        return data.value;
-    };
+    }
 
     /**
      * Enabled a disabled element.
      * @param $o
      */
-    Instance.enable = function(subject) {
+    Instance.prototype.enable = function(subject) {
         $select(subject).removeAttr('disabled');
-    };
+    }
 
     /**
      * Disable an eneabled element.
      * @param $o
      */
-    Instance.disable = function(subject) {
+    Instance.prototype.disable = function(subject) {
         $select(subject).attr('disabled', '');
-    };
+    }
 
     /**
      * Initialize the HTML UI or update with result from a JSX script callback.
      * @param {*} result
      */
-    Instance.init = function(result) {
+    Instance.prototype.init = function(result) {
+
+        var module = this;
 
         var $message = $("#message");
         var $open    = $("#open-button");
@@ -140,7 +138,7 @@ var Client = (($, csInterface, console) => {
 
         // Example enabling a disabled button.
 
-        Instance.enable($open);
+        this.enable($open);
 
         // Client validate should throw an error if the validation fails,
         // or return the expected data if it passes. Wrap the validation
@@ -149,17 +147,25 @@ var Client = (($, csInterface, console) => {
         try {
 
             if (typeof(result) !== 'undefined') {
-                data = Instance.validate(result);
+                data = this.validate(result);
             }
 
-            Instance.showMessage(data || "This is the first run");
+            this.showMessage(data || "This is the first run");
 
             var openHandler = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
 
-                Instance.hostMethod("Open button clicked", Client.showMessage);
-                // Instance.disable($open);
+                module.hostMethod("Open button clicked", function(result) {
+                    module.feedback(result);
+                });
+
+                /*
+                 * Example : You can disable a button after it is clicked:
+                 *
+                 *     Instance.disable($open);
+                 */
+
                 $open.blur();
             }
 
@@ -167,8 +173,16 @@ var Client = (($, csInterface, console) => {
                 e.preventDefault();
                 e.stopPropagation();
 
-                Instance.hostMethod("Save button clicked", Client.showMessage);
-                // Instance.disable($save);
+                module.hostMethod("Save button clicked", function(result) {
+                    module.feedback(result);
+                });
+
+                /*
+                 * Example : You can disable a button after it is clicked:
+                 *
+                 *     Instance.disable($save);
+                 */
+
                 $save.blur();
             }
 
@@ -177,68 +191,68 @@ var Client = (($, csInterface, console) => {
         }
         catch(e) {
             // Handle the error however you need to.
-            Instance.error(message);
-            // Instance.showMessage(e.message);
-            // console.error('Client Instance error', e);
+            this.showMessage(e.message);
+            this.error('Client Instance error', e);
         }
-    };
+    }
 
     /**
      * Call the csInterface to open session.
      * @param filePath
      */
-    Instance.hostMethod = function(someData, theCallback) {
+    Instance.prototype.hostMethod = function(someData, theCallback) {
         csInterface.evalScript('Host.publicMethod("' + someData + '")', theCallback);
-    };
+    }
 
     /**
      * Send error message to log via CSInterface.
      * @param message
      */
-    Instance.error = function(message) {
-        Instance.log(message, 'error');
-    };
+    Instance.prototype.error = function(message) {
+        this.log(message, 'error');
+    }
 
     /**
      * Send info message to log via CSInterface.
      * @param message
      */
-    Instance.info = function(message) {
-        Instance.log(message, 'info');
-    };
+    Instance.prototype.info = function(message) {
+        this.log(message, 'info');
+    }
 
     /**
      * Send success message to log via CSInterface.
      * @param message
      */
-    Instance.success = function(message) {
-        Instance.log(message, 'success');
-    };
+    Instance.prototype.success = function(message) {
+        this.log(message, 'success');
+    }
 
     /**
      * Send warning message to log via CSInterface.
      * @param message
      */
-    Instance.warn = function(message) {
-        Instance.log(message, 'warn');
-    };
+    Instance.prototype.warn = function(message) {
+        this.log(message, 'warn');
+    }
 
     /**
      * Log a message to the client console and the host logger.
      * @param message
      */
-    Instance.log = function(message, type) {
+    Instance.prototype.log = function(message, type) {
         if (type === undefined) type = 'info';
         if (typeof(console[type]) === 'function') {
             console[type](message);
         }
         csInterface.evalScript('csxLogger("' + message + '", "' + type + '")')
-    };
+    }
 
     /**
      * Flyout menu builder.
      */
-    Instance.initFlyoutMenu = function() {
+    Instance.prototype.initFlyoutMenu = function() {
+        var module = this;
         var flyoutMenu = new FlyoutMenu();
         flyoutMenu.add('enabledMenuItem',   'Enabled Menu Item', true, false, false);
         flyoutMenu.add('disabledMenuItem',  'Disabled Menu Item', false, false, false);
@@ -247,60 +261,60 @@ var Client = (($, csInterface, console) => {
         flyoutMenu.add('actionMenuItem',    'Click to toggle the target', true, false, false);
         flyoutMenu.add('targetMenuItem',    'I am the target', true, false, false);
         flyoutMenu.add('reloadExtension',   'Reload Extension', true, false, false);
-        flyoutMenu.setHandler(Instance.flyoutMenuClickedHandler);
+        flyoutMenu.setHandler(function(e) {
+            module.flyoutMenuClickedHandler(e);
+        });
         flyoutMenu.build();
 
-        Instance.menuState = flyoutMenu.getState();
+        this.menuState = flyoutMenu.getState();
 
         console.log('flyoutMenu', flyoutMenu);
-        console.log('flyoutMenu.state', Instance.menuState);
-    };
+        console.log('flyoutMenu.state', this.menuState);
+    }
 
     /**
      * Flyout menu click handler.
      * @param event
      */
-    Instance.flyoutMenuClickedHandler = (function(console) {
-        return function(event) {
-            try {
+    Instance.prototype.flyoutMenuClickedHandler = function(event) {
+        try {
 
-                var menuId = event.data.menuId;
+            var menuId = event.data.menuId;
 
-                var itemState;
+            var itemState;
 
-                if (Instance.menuState[menuId]) {
-                    itemState = Instance.menuState[menuId];
-                }
-
-                Instance.log(menuId + ' clicked', 'info');
-
-                switch (menuId) {
-                    case "checkableMenuItem":
-                        itemState.checked = ! itemState.checked;
-                        csInterface.updatePanelMenuItem("Yo, check it", true, itemState.checked);
-                        break;
-
-                    case "actionMenuItem":
-                        itemState.enabled = ! itemState.enabled;
-                        csInterface.updatePanelMenuItem("I am the target", itemState.enabled, false);
-                        break;
-
-                    case "reloadExtension":
-                        reloadExtension();
-                        break;
-
-                    default:
-                        break;
-                }
+            if (this.menuState[menuId]) {
+                itemState = this.menuState[menuId];
             }
-            catch(e) { alert(e) }
+
+            this.log(menuId + ' clicked', 'info');
+
+            switch (menuId) {
+                case "checkableMenuItem":
+                    itemState.checked = ! itemState.checked;
+                    csInterface.updatePanelMenuItem("Yo, check it", true, itemState.checked);
+                    break;
+
+                case "actionMenuItem":
+                    itemState.enabled = ! itemState.enabled;
+                    csInterface.updatePanelMenuItem("I am the target", itemState.enabled, false);
+                    break;
+
+                case "reloadExtension":
+                    this.reload();
+                    break;
+
+                default:
+                    break;
+            }
         }
-    })(console);
+        catch(e) { alert(e) }
+    }
 
     /**
      * Reload the index.html
      */
-    function reloadExtension() {
+    Instance.prototype.reload = function() {
         try {
             window.cep.process.removeAllListeners();
             window.location.href = "index.html";
@@ -309,6 +323,30 @@ var Client = (($, csInterface, console) => {
             window.location.href = "index.html";
         }
     }
+
+    /**
+     * Validate a JSON string.
+     * @author  Thanks to https://stackoverflow.com/users/244374/matt-h
+     * @url     https://stackoverflow.com/a/20392392/11357814
+     * @param   {string}    jsonString  The stringified object to test.
+     * @returns {boolean}
+     */
+    function isJSON(jsonString) {
+        try {
+            var o = JSON.parse(jsonString);
+
+            // Handle non-exception-throwing cases:
+            // Neither JSON.parse(false) or JSON.parse(1234) throw errors, hence the type-checking,
+            // but... JSON.parse(null) returns null, and typeof null === "object",
+            // so we must check for that, too. Thankfully, null is falsey, so this suffices:
+            if (o && typeof o === "object") {
+                return true;
+            }
+        }
+        catch(e){}
+
+        return false;
+    };
 
     /**
      * Test if a value is empty.
@@ -356,14 +394,13 @@ var Client = (($, csInterface, console) => {
     }
 
     // Run now
+    var instance = new Instance();
+    instance.init();
+    instance.initFlyoutMenu();
 
-    Instance.init();
-    Instance.initFlyoutMenu();
-    //Instance.hostMethod('Initial Run', Client.init);
+    return instance;
 
-    return Instance;
-
-})(jQuery, csInterface, console);
+})(jQuery, csInterface, window.console || {});
 
 if (typeof exports !== 'undefined') {
     exports.Client = Client;

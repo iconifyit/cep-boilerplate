@@ -25,10 +25,11 @@ var module = typeof module === 'undefined' ? {} : module;
  * Declare the target app.
  */
 
-#include "Logger.jsx"
-#include "JSON.jsx"
-#include "Utils.jsx"
+#include "Logger.jsx";
+#include "JSON.jsx";
+#include "Utils.jsx";
 #include "Configuration.jsx";
+#include "HostResponse.js";
 
 
 /**
@@ -55,7 +56,7 @@ var logger = new Logger(Config.get('APP_NAME'), Config.get('LOGFOLDER'));
 
 function debug(what) {
     logger.info(what);
-    alert(what);
+    // alert(what);
 }
 
 debug('Logger instance created');
@@ -70,21 +71,25 @@ var Host = (function(Config, logger) {
      */
     function _privateMethod(someData) {
 
-        // Write to the Host's logger output.
-        debug(someData);
+        debug('Start Host._privateMethod');
+        debug('Debug someData : ' + someData);
 
         // Do something cool.
 
-        var result = JSON.stringify({
-            "value": "The Host received the message : " + someData
-        });
+        // var result = JSON.stringify({
+        //     "value": "The Host received the message : " + someData
+        // });
 
-        debug(result);
+        var hostResponse = new HostResponse(
+            "The Host received the message - " + someData,
+            undefined
+        );
 
-        return result;
+        debug('hostResponse : ' + typeof hostResponse);
+        debug('hostResponse.stringify : ' + hostResponse.stringify());
+
+        return hostResponse.stringify();
     };
-
-    alert('Host created');
 
     /**
      * Public object.
