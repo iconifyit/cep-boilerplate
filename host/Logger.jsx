@@ -80,7 +80,7 @@ var Logger = function(name, folder) {
         this.folder.absoluteURI + "/" + name + "-" + dateFormat(new Date().getTime()) + ".log"
     );
 
-};
+}
 
 /**
  * Logger prototype.
@@ -139,10 +139,9 @@ Logger.prototype = {
      * @param message
      */
     log : function(message, type) {
-        Utils.write_file(
-            this.file.absoluteURI,
-            "[" + this.types[type] + "][" + new Date().toUTCString() + "] " + message
-        );
+        var logMessage = "[" + this.types[type] + "][" + new Date().toUTCString() + "] " + message;
+        Utils.write_file(this.file.absoluteURI, logMessage);
+        return logMessage;
     },
 
     /**
@@ -180,6 +179,6 @@ Logger.prototype = {
 
         }
     }
-};
+}
 
-module.exports = Logger;
+// module.exports = Logger;

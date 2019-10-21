@@ -1,126 +1,123 @@
 /**
- * @author Scott Lewis <scott@atomiclotus.net>
- * @copyright 2018 Scott Lewis
- * @version 1.0.0
- * @url http://github.com/iconifyit
- * @url https://atomiclotus.net
- *
- * ABOUT:
- *
- *    This script is a very basic boilerplate for Adobe CEP extensions.
- *
- * NO WARRANTIES:
- *
- *   You are free to use, modify, and distribute this script as you see fit.
- *   No credit is required but would be greatly appreciated.
- *
- *   THIS SCRIPT IS OFFERED AS-IS WITHOUT ANY WARRANTY OR GUARANTEES OF ANY KIND.
- *   YOU USE THIS SCRIPT COMPLETELY AT YOUR OWN RISK AND UNDER NO CIRCUMSTANCES WILL
- *   THE DEVELOPER AND/OR DISTRIBUTOR OF THIS SCRIPT BE HELD LIABLE FOR DAMAGES OF
- *   ANY KIND INCLUDING LOSS OF DATA OR DAMAGE TO HARDWARE OR SOFTWARE. IF YOU DO
- *   NOT AGREE TO THESE TERMS, DO NOT USE THIS SCRIPT.
+ * Create symbols for classes in global scope.
  */
-var module = typeof module === 'undefined' ? {} : module;
-/**
- * Declare the target app.
- */
-
-#include "Logger.jsx";
-#include "JSON.jsx";
-#include "Utils.jsx";
-#include "Configuration.jsx";
-#include "HostResponse.js";
-
+var host,
+    Config,
+    Utils,
+    Logger,
+    logger;
 
 /**
- * @type {{
- *      APP_NAME: string,
-  *     USER: *,
-  *     HOME: *,
-  *     DOCUMENTS: *
-  * }}
+ * The Host app class.
+ * @param Config
+ * @returns {Host}
+ * @constructor
  */
-var Config = new Configuration({
-    APP_NAME         : 'cep-boilerplate',
-    USER             : $.getenv('USER'),
-    HOME             : $.getenv('HOME'),
-    DOCUMENTS        : '~/Documents',
-    LOGFOLDER        : '~/Downloads/cep-boilerplate'
-});
+var Host = function(Config) {
 
-/**
- * The local scope logger object.
- * @type {Logger}
- */
-var logger = new Logger(Config.get('APP_NAME'), Config.get('LOGFOLDER'));
+    var _logger;
 
-function debug(what) {
-    logger.info(what);
-    // alert(what);
-}
+    _logger = new Logger(Config.EXTENSION_ID, Config.LOG_FOLDER);
+    _logger.clear();
 
-debug('Logger instance created');
-
-/**
- * Run the script using the Module patter.
- */
-var Host = (function(Config, logger) {
+    logger = _logger;
 
     /**
-     * Private, local function.
+     * Create the USER_DATE folder if it does not exist.
+     * @private
      */
-    function _privateMethod(someData) {
+    function _initDataFolder() {
+        try {
 
-        debug('Start Host._privateMethod');
-        debug('Debug someData : ' + someData);
+            var dataFolder = Utils.folder(Config.USER_DATA),
+                logFolder  = Utils.folder(Config.LOG_FOLDER);
 
-        // Do something cool.
-
-        // var result = JSON.stringify({
-        //     "value": "The Host received the message : " + someData
-        // });
-
-        var hostResponse = new HostResponse(
-            "The Host received the message - " + someData,
-            undefined
-        );
-
-        debug('hostResponse : ' + typeof hostResponse);
-        debug('hostResponse.stringify : ' + hostResponse.stringify());
-
-        return hostResponse.stringify();
-    };
-
-    /**
-     * Public object.
-     */
-    return {
-        logger: logger,
-        /**
-         * Public function.
-         * @returns {*}
-         */
-        publicMethod: function(someData) {
-            debug('Call Host.publicMethod');
-            return _privateMethod(someData);
+            return '_initDataFolder : ' + typeof(dataFolder) != 'undefined' && typeof(logFolder) != 'undefined';
+        }
+        catch(e) {
+            alert('_initDataFolder : ' + e + ' - ' + $.fileName + ':' + $.line);
+            return '_initDataFolder : ' + e;
         }
     }
 
-    // The closure takes the Configuration object as its argument.
-})(Config, logger);
+    /**
+     * Initialize the Host.
+     * @param {string} extensionID
+     */
+    function _init() {
 
-debug('Host file loaded');
+        var initFolders = _initDataFolder();
+
+        $.global.logfolder = Config.LOG_FOLDER;
+        $.global.Config    = Config;
+        $.global.API_KEY   = Config.API_KEY;
+
+        _loadExternalObject();
+
+        return initFolders;
+    }
+
+    // Initialize the object.
+
+    _init();
+
+    /**
+     * Return the public interface.
+     */
+    return {
+        init : function() {
+            return _init();
+        },
+        alert : function(message) {
+            alert(message);
+        },
+        logger : _logger
+    }
+};
 
 /**
- * Use this to interface from client side.
- * Example: csxScript('log("some text", "info")')
- * @param message
- * @param type
+ * Create an instance of the Host object.
+ * @returns {boolean}
  */
-function csxLogger(message, type) {
+function createHostInstance() {
     try {
-        logger.info( message );
-        return 'ok';
+        host = new Host(Config);
+        return typeof(host) != 'undefined';
+    }
+    catch(e) {
+        alert(e);
+        return false;
+    }
+}
+
+/**
+ * Create a new custom event object.
+ * @param type
+ * @param data
+ * @returns {CSXSEvent}
+ * @constructor
+ */
+function CustomEvent(type, data) {
+    var event  = new CSXSEvent();
+    event.type = type;
+    event.data = data;
+    return event;
+}
+
+/**
+ * Wrappedr for CEP's evalFile.
+ * @param theFilePath
+ * @returns {*}
+ */
+function include(theFilePath) {
+    try {
+        if ((new File(theFilePath)).exists) {
+            $.evalFile( theFilePath );
+            return (new File(theFilePath)).name;
+        }
+        else {
+            return theFilePath + ' does not exist';
+        }
     }
     catch(e) {
         return e;
