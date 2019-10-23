@@ -21,6 +21,7 @@
  *   NOT AGREE TO THESE TERMS, DO NOT USE THIS SCRIPT.
  */
 var module = typeof module === 'undefined' ? {} : module;
+
 /**
  * Declare the target app.
  */
@@ -28,9 +29,10 @@ var module = typeof module === 'undefined' ? {} : module;
 #include "Logger.jsx";
 #include "JSON.jsx";
 #include "Utils.jsx";
+#include "core/functions.js";
+#include "core/Helpers.js";
 #include "Configuration.jsx";
 #include "HostResponse.js";
-
 
 /**
  * @type {{
@@ -66,48 +68,110 @@ debug('Logger instance created');
  */
 var Host = (function(Config, logger) {
 
+    var Instance = function(Config, logger) {
+        this.logger = logger;
+    }
+
     /**
      * Private, local function.
      */
-    function _privateMethod(someData) {
+    Instance.prototype.publicMethod = function(someData) {
 
-        debug('Start Host._privateMethod');
+        debug('Start Host.publicMethod');
         debug('Debug someData : ' + someData);
 
-        // Do something cool.
+        Host.hello('Scott');
 
-        // var result = JSON.stringify({
-        //     "value": "The Host received the message : " + someData
-        // });
-
-        var hostResponse = new HostResponse(
+        var response = new HostResponse(
             "The Host received the message - " + someData,
             undefined
         );
 
-        debug('hostResponse : ' + typeof hostResponse);
-        debug('hostResponse.stringify : ' + hostResponse.stringify());
+        debug('hostResponse : ' + typeof response);
+        debug('hostResponse.stringify : ' + response.stringify());
 
-        return hostResponse.stringify();
+        return response.stringify();
     };
 
-    /**
-     * Public object.
-     */
-    return {
-        logger: logger,
-        /**
-         * Public function.
-         * @returns {*}
-         */
-        publicMethod: function(someData) {
-            debug('Call Host.publicMethod');
-            return _privateMethod(someData);
+    // Add code here to dynamically load external Host plugins.
+    Instance.prototype.loadPlugins = function(pluginsPath) {
+
+        var config,
+            plugins;
+
+        try {
+            config = Utils.read_json_file(pluginsPath + '/plugins.json');
+            plugins = config.plugins;
+
+            plugins.map(function(plugin) {
+                if (! isDefined(plugin)) return;
+                if (isString(plugin.host)) {
+                    var script = plugin.host;
+                    try {
+                        $.evalFile([pluginsPath, plugin.name, script].join('/'));
+                    }
+                    catch(e) {
+                        logger.error(e + '[' + script + ']')
+                    }
+                }
+                else if (isArray(plugin.host)) {
+                    plugin.host.map(function(script) {
+                        try {
+                            $.evalFile([pluginsPath, plugin.name, script].join('/'));
+                        }
+                        catch(e) {
+                            logger.error(e + '[' + script + ']');
+                        }
+                    });
+                }
+            });
+
+            return new HostResponse('Host plugins loaded', undefined).stringify();
+        }
+        catch(e) {
+            logger.error('[loadPlugins] ' + e);
+            return new HostResponse(undefined, '[Host.loadPlugins] ' + e).stringify();
         }
     }
 
-    // The closure takes the Configuration object as its argument.
+    /**
+     * Allows you to add methods to the Host without modifying the core code.
+     *
+     *   Example:
+     *
+     *   Host.fn('helloWorld', function() {
+     *       this.logger.info("Hello World!");
+     *   });
+     */
+    Instance.prototype.fn = function(name, _function) {
+        this.logger.info('Added method ' + name + ' to Host prototype');
+        Instance.prototype[name] = _function;
+    }
+
+    return new Instance(Config, logger);
+
 })(Config, logger);
+
+/**
+ * Wrappedr for CEP's evalFile.
+ * @param theFilePath
+ * @returns {*}
+ */
+function include(theFilePath) {
+    try {
+        if ((new File(theFilePath)).exists) {
+            $.evalFile( theFilePath );
+            return (new File(theFilePath)).name;
+        }
+        else {
+            return theFilePath + ' does not exist';
+        }
+    }
+    catch(e) {
+        return e;
+    }
+}
+
 
 debug('Host file loaded');
 

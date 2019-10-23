@@ -20,12 +20,33 @@
  *   ANY KIND INCLUDING LOSS OF DATA OR DAMAGE TO HARDWARE OR SOFTWARE. IF YOU DO
  *   NOT AGREE TO THESE TERMS, DO NOT USE THIS SCRIPT.
  */
-var Client = (($, csInterface, console) => {
+var Client = (($, csInterface) => {
 
     var Instance = function() {
 
-        this.flyoutMenu = {state: []};
+        /**
+         * The FlyOutMenu virtual object.
+         * @type {{state: Array}}
+         */
+        // this.flyoutMenu = {state: []};
+
+        /**
+         * The FlyOutMenu state.
+         * @type {{}}
+         */
         this.menuState = {};
+
+        /**
+         * The extension meta data.
+         * @type {object}
+         */
+        this.extension = null;
+
+        /**
+         * User-defined plugins already loaded.
+         * @type {Array}
+         */
+        this.plugins = [];
     }
 
     /**
@@ -124,6 +145,29 @@ var Client = (($, csInterface, console) => {
     }
 
     /**
+     * Initialize the extension meta data.
+     * @returns {{mainPath, isAutoVisible, minWidth, version, windowType, minHeight, basePath, maxHeight, name, width, id, height, maxWidth}}
+     */
+    Instance.prototype.getExtension = function() {
+
+        var module = this;
+
+        var extension;
+
+        if (! this.extension) {
+            this.extension = getExtension(csInterface.getExtensionID());
+
+            var extPath   = csInterface.getSystemPath(SystemPath.EXTENSION);
+
+            this.extension.customPath = extPath + '/custom';
+
+            console.log('this.extension', this.extension);
+        }
+
+        return this.extension;
+    }
+
+    /**
      * Initialize the HTML UI or update with result from a JSX script callback.
      * @param {*} result
      */
@@ -160,6 +204,10 @@ var Client = (($, csInterface, console) => {
                     module.feedback(result);
                 });
 
+                // module.host('hello', 'Boomer', function(result) {
+                //     module.feedback(result);
+                // });
+
                 /*
                  * Example : You can disable a button after it is clicked:
                  *
@@ -188,6 +236,8 @@ var Client = (($, csInterface, console) => {
 
             $open.off('click', openHandler).click(openHandler);
             $save.off('click', saveHandler).click(saveHandler);
+
+            // module.initHost();
         }
         catch(e) {
             // Handle the error however you need to.
@@ -197,11 +247,101 @@ var Client = (($, csInterface, console) => {
     }
 
     /**
+     * Initialize some variables in the Host environment.
+     */
+    // Instance.prototype.initHost = function() {
+    //
+    //     var module = this;
+    //
+    //     // Share the Extension data with the Host
+    //
+    //     var Extension = module.getExtension();
+    //
+    //     csInterface.evalScript('$.global.extensionID = "' + csInterface.getExtensionID() + '";');
+    //     csInterface.evalScript('$.global.extension = ' + stringify(Extension) + ';');
+    //
+    //     // Pass Config object to Host so we only load & parse once and are using
+    //     // the same object in both scopes.
+    //
+    //     csInterface.evalScript('Extension = ' + stringify(Extension) + ';', function(result) {
+    //         module.feedback(result);
+    //     });
+    // }
+
+    /**
+     * Load the Host's plugins.
+     */
+    Instance.prototype.loadHostPlugins = function() {
+        var module = this;
+        csInterface.evalScript('Host.loadPlugins("' + this.extension.customPath + '")', function(result) {
+            module.feedback(result);
+        });
+    }
+
+    /**
+     * Load user-defined plugins.
+     * @param pluginsPath
+     */
+    Instance.prototype.loadPlugins = function() {
+
+        var module = this;
+
+        var config,
+            plugins,
+            pluginsPath;
+
+        var extension = module.getExtension(),
+            extPath   = csInterface.getSystemPath(SystemPath.EXTENSION);
+
+        extension.customPath = extPath + '/custom';
+
+        console.log('extension', extension);
+
+        pluginsPath = extension.customPath;
+
+        try {
+            config = JSON.parse(readFileData(pluginsPath + '/plugins.json'));
+
+            plugins = config.plugins;
+
+            plugins.map(function(plugin) {
+                if (! isDefined(plugin)) return;
+                plugin.client.map(function(script) {
+                    try {
+                        console.log([pluginsPath, plugin.name, script].join('/'));
+                        addScript([pluginsPath, plugin.name, script].join('/'), function() {
+                            console.log([pluginsPath, plugin.name, script].join('/') + ' added');
+                        });
+                        module.plugins.push(plugin.name);
+                    }
+                    catch(e) {
+                        error(e + '[' + script + ']');
+                    }
+                });
+
+            });
+
+            console.info('Client.plugins', this.plugins);
+        }
+        catch(e) {
+            error('[loadPlugins] ' + e);
+        }
+    }
+
+    /**
      * Call the csInterface to open session.
      * @param filePath
      */
     Instance.prototype.hostMethod = function(someData, theCallback) {
         csInterface.evalScript('Host.publicMethod("' + someData + '")', theCallback);
+    }
+
+    /**
+     * Call the csInterface to open session.
+     * @param filePath
+     */
+    Instance.prototype.host = function(method, data, theCallback) {
+        csInterface.evalScript('Host.' + method + '("' + data + '")', theCallback);
     }
 
     /**
@@ -325,6 +465,20 @@ var Client = (($, csInterface, console) => {
     }
 
     /**
+     * Allows you to add methods to the Host without modifying the core code.
+     *
+     *   Example:
+     *
+     *   Host.fn('helloWorld', function() {
+     *       this.logger.info("Hello World!");
+     *   });
+     */
+    Instance.prototype.fn = function(name, _function) {
+        console.log('Added method ' + name + ' to Client prototype');
+        Instance.prototype[name] = _function;
+    }
+
+    /**
      * Validate a JSON string.
      * @author  Thanks to https://stackoverflow.com/users/244374/matt-h
      * @url     https://stackoverflow.com/a/20392392/11357814
@@ -400,7 +554,14 @@ var Client = (($, csInterface, console) => {
 
     return instance;
 
-})(jQuery, csInterface, window.console || {});
+})(jQuery, csInterface);
+
+/**
+ * Load user-defined plugins
+ */
+Client.loadPlugins();
+Client.loadHostPlugins();
+
 
 if (typeof exports !== 'undefined') {
     exports.Client = Client;

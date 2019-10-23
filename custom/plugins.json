@@ -1,0 +1,14 @@
+{
+    "plugins": [
+        {
+            "name"   :  "hello",
+            "client" : ["client.js"],
+            "host"   : ["host.js"]
+        },
+        {
+            "name"   :  "info",
+            "client" : ["client.js"],
+            "host"   : ["host.js"]
+        }
+    ]
+}
