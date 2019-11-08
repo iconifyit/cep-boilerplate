@@ -13,10 +13,10 @@ var LayerInfo = function(theItem, index) {
         if (numProperties) {
             for (var i = 1; i <= numProperties; i++) {
                 // processProperty(theItem)
-                properties.concat([], processProperty(theItem));
-                // properties.push(
-                //     new PropertyInfo(theItem.property(i), i)
-                // );
+                // properties.concat([], processProperty(theItem));
+                properties.push(
+                    new PropertyInfo(theItem.property(i), i)
+                );
             }
         }
 
