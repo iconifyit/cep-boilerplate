@@ -20,7 +20,10 @@
  *   ANY KIND INCLUDING LOSS OF DATA OR DAMAGE TO HARDWARE OR SOFTWARE. IF YOU DO
  *   NOT AGREE TO THESE TERMS, DO NOT USE THIS SCRIPT.
  */
-var Client = (($, csInterface) => {
+
+var local = {};
+
+local.Client = ($, csInterface) => {
 
     var Instance = function() {
 
@@ -115,6 +118,9 @@ var Client = (($, csInterface) => {
      */
     Instance.prototype.validate = function(result) {
         try {
+
+            // console.log('Instance.prototype.validate(result)', result);
+
             var hostResponse = new HostResponse().parse(result);
 
             if (hostResponse.isError()) {
@@ -146,7 +152,21 @@ var Client = (($, csInterface) => {
 
     /**
      * Initialize the extension meta data.
-     * @returns {{mainPath, isAutoVisible, minWidth, version, windowType, minHeight, basePath, maxHeight, name, width, id, height, maxWidth}}
+     * @returns {{
+     *      mainPath,
+     *      isAutoVisible,
+     *      minWidth,
+     *      version,
+     *      windowType,
+     *      minHeight,
+     *      basePath,
+     *      maxHeight,
+     *      name,
+     *      width,
+     *      id,
+     *      height,
+     *      maxWidth
+     * }}
      */
     Instance.prototype.getExtension = function() {
 
@@ -180,13 +200,7 @@ var Client = (($, csInterface) => {
         var $save    = $("#save-button");
         var data     = null;
 
-        // Example enabling a disabled button.
-
         this.enable($open);
-
-        // Client validate should throw an error if the validation fails,
-        // or return the expected data if it passes. Wrap the validation
-        // call in a try/catch block to trap errors.
 
         try {
 
@@ -204,16 +218,6 @@ var Client = (($, csInterface) => {
                     module.feedback(result);
                 });
 
-                // module.host('hello', 'Boomer', function(result) {
-                //     module.feedback(result);
-                // });
-
-                /*
-                 * Example : You can disable a button after it is clicked:
-                 *
-                 *     Instance.disable($open);
-                 */
-
                 $open.blur();
             }
 
@@ -225,12 +229,6 @@ var Client = (($, csInterface) => {
                     module.feedback(result);
                 });
 
-                /*
-                 * Example : You can disable a button after it is clicked:
-                 *
-                 *     Instance.disable($save);
-                 */
-
                 $save.blur();
             }
 
@@ -238,6 +236,8 @@ var Client = (($, csInterface) => {
             $save.off('click', saveHandler).click(saveHandler);
 
             // module.initHost();
+
+            this.getExtension();
         }
         catch(e) {
             // Handle the error however you need to.
@@ -247,35 +247,32 @@ var Client = (($, csInterface) => {
     }
 
     /**
-     * Initialize some variables in the Host environment.
-     */
-    // Instance.prototype.initHost = function() {
-    //
-    //     var module = this;
-    //
-    //     // Share the Extension data with the Host
-    //
-    //     var Extension = module.getExtension();
-    //
-    //     csInterface.evalScript('$.global.extensionID = "' + csInterface.getExtensionID() + '";');
-    //     csInterface.evalScript('$.global.extension = ' + stringify(Extension) + ';');
-    //
-    //     // Pass Config object to Host so we only load & parse once and are using
-    //     // the same object in both scopes.
-    //
-    //     csInterface.evalScript('Extension = ' + stringify(Extension) + ';', function(result) {
-    //         module.feedback(result);
-    //     });
-    // }
-
-    /**
      * Load the Host's plugins.
      */
     Instance.prototype.loadHostPlugins = function() {
         var module = this;
+
+        if (! this.extension) {
+            this.getExtension();
+        }
+
+        console.log('this.extension.customPath', this.extension.customPath);
+
         csInterface.evalScript('Host.loadPlugins("' + this.extension.customPath + '")', function(result) {
             module.feedback(result);
         });
+    }
+
+    Instance.prototype.getPlugins = function(theFilePath) {
+        console.log('Call Instance.prototype.getPlugins');
+        var result = window.cep.fs.readFile(theFilePath);
+        if (result.err !== 0) {
+            throw new Error("ReadFileError : " + result.err);
+        }
+        var config = JSON.parse(result.data);
+        plugins = config.plugins;
+        console.log('Instance.prototype.getPlugins plugins', plugins);
+        return plugins;
     }
 
     /**
@@ -300,12 +297,12 @@ var Client = (($, csInterface) => {
         pluginsPath = extension.customPath;
 
         try {
-            config = JSON.parse(readFileData(pluginsPath + '/plugins.json'));
 
-            plugins = config.plugins;
+            plugins = this.getPlugins(pluginsPath + '/plugins.json');
 
             plugins.map(function(plugin) {
                 if (! isDefined(plugin)) return;
+                if (isTrue(plugin.disabled)) return;
                 plugin.client.map(function(script) {
                     try {
                         console.log([pluginsPath, plugin.name, script].join('/'));
@@ -479,52 +476,6 @@ var Client = (($, csInterface) => {
     }
 
     /**
-     * Validate a JSON string.
-     * @author  Thanks to https://stackoverflow.com/users/244374/matt-h
-     * @url     https://stackoverflow.com/a/20392392/11357814
-     * @param   {string}    jsonString  The stringified object to test.
-     * @returns {boolean}
-     */
-    function isJSON(jsonString) {
-        try {
-            var o = JSON.parse(jsonString);
-
-            // Handle non-exception-throwing cases:
-            // Neither JSON.parse(false) or JSON.parse(1234) throw errors, hence the type-checking,
-            // but... JSON.parse(null) returns null, and typeof null === "object",
-            // so we must check for that, too. Thankfully, null is falsey, so this suffices:
-            if (o && typeof o === "object") {
-                return true;
-            }
-        }
-        catch(e){}
-
-        return false;
-    };
-
-    /**
-     * Test if a value is empty.
-     * @param {*} data
-     * @returns {boolean}
-     */
-    function isEmpty(data) {
-        if (typeof(data) == 'number' || typeof(data) == 'boolean') {
-            return false;
-        }
-        if (typeof(data) == 'undefined' || data === null) {
-            return true;
-        }
-        if (typeof(data.length) != 'undefined') {
-            return data.length == 0;
-        }
-        var count = 0;
-        for (var i in data) {
-            if (data.hasOwnProperty(i)) count ++;
-        }
-        return count == 0;
-    }
-
-    /**
      * Coerce any type of selector to the object it references, returned as a jQuery object.
      * @param subject
      * @returns {*}
@@ -537,30 +488,42 @@ var Client = (($, csInterface) => {
         return $o;
     }
 
-    /**
-     * Case-insensitive string comparison.
-     * @param aText
-     * @param bText
-     * @returns {boolean}
-     */
-    function strcmp(aText, bText) {
-        return aText.toLowerCase() == bText.toLowerCase();
-    }
+    var instance;
 
     // Run now
-    var instance = new Instance();
-    instance.init();
-    instance.initFlyoutMenu();
+    try {
+        instance = new Instance();
+    }
+    catch(e) { alert(1) }
+
+    try {
+        instance.init();
+    }
+    catch(e) { alert(2) }
+
+    try {
+        instance.initFlyoutMenu();
+    }
+    catch(e) { alert(3) }
+
 
     return instance;
 
-})(jQuery, csInterface);
+}
 
 /**
  * Load user-defined plugins
  */
-Client.loadPlugins();
-Client.loadHostPlugins();
+(($) => {
+    $(() => {
+        csInterface.evalScript('createHostInstance()', (result) => {
+            console.log('createHostInstance()', result);
+            Client = local.Client($, csInterface);
+            Client.loadPlugins();
+            Client.loadHostPlugins();
+        });
+    });
+})(jQuery);
 
 
 if (typeof exports !== 'undefined') {

@@ -110,7 +110,7 @@ function isObject(theItem) {
  * @private
  */
 function isFunction(theItem) {
-    return isType(theItem, 'function');
+    return theItem instanceof Function;
 }
 
 /**
@@ -129,6 +129,30 @@ function isString(theItem) {
  */
 function isNumber(theItem) {
     return ! isNaN(theItem);
+}
+
+/**
+ * Validate a JSON string.
+ * @author  Thanks to https://stackoverflow.com/users/244374/matt-h
+ * @url     https://stackoverflow.com/a/20392392/11357814
+ * @param   {string}    jsonString  The stringified object to test.
+ * @returns {boolean}
+ */
+function isJSON(jsonString) {
+    try {
+        var o = JSON.parse(jsonString);
+
+        // Handle non-exception-throwing cases:
+        // Neither JSON.parse(false) or JSON.parse(1234) throw errors, hence the type-checking,
+        // but... JSON.parse(null) returns null, and typeof null === "object",
+        // so we must check for that, too. Thankfully, null is falsey, so this suffices:
+        if (o && typeof o === "object") {
+            return true;
+        }
+    }
+    catch(e){}
+
+    return false;
 }
 
 /**
@@ -331,7 +355,7 @@ function pack(base, add, divider) {
  * @returns {boolean}
  */
 function strcmp(aText, bText) {
-    return aText.toLowerCase() == bText.toLowerCase();
+    return aText.toLowerCase() === bText.toLowerCase();
 }
 
 /**
@@ -1219,4 +1243,63 @@ function info(message, vars) {
     trap(function() { console.log(message);}, null);
     trap(function() { csInterface.evalScript( 'Host.logger.info("' + message + '")' ); }, null);
     trap(function() { Host.info.error(message); }, null);
+}
+
+/**
+ * Write to a file.
+ * @param path
+ * @param content
+ * @returns {*}
+ */
+function fwrite(path, content, choose) {
+    try {
+        var file = new File(path);
+
+        if (choose) {
+            file = file.saveDlg("Save new file");
+        }
+
+        file.encoding = "UTF8";
+
+        file.open("w");
+        if (file.error != "")
+            throw file.error;
+
+        file.write(content);
+        if (file.error != "")
+            throw file.error;
+
+        file.close();
+        if (file.error != "")
+            throw file.error;
+    }
+    catch(e) {
+        try {file.close()}catch(e){}
+        throw e;
+    }
+    return true;
+}
+
+/**
+ * Shows a Save dialog and writes content to selected file.
+ * @param content
+ * @returns {string|*}
+ */
+function fsave(content, fname) {
+    return fwrite(Config.LOGFOLDER + '/' + fname, content, true);
+}
+
+/**
+ * Round to whole fixed decimals.
+ * @param num
+ * @param decimals
+ * @returns {number|*}
+ */
+function round(num, decimals) {
+    num = num || 0;
+    if (typeof num === 'number') {
+        return parseFloat(num.toFixed(decimals));
+    } else {
+        return roundArray(num, decimals);
+    }
 }

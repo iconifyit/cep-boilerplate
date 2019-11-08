@@ -1,14 +1,34 @@
 {
     "plugins": [
         {
-            "name"   :  "hello",
-            "client" : ["client.js"],
-            "host"   : ["host.js"]
+            "name"     :  "Helpers",
+            "client"   : [
+                "AETypes.js",
+                "BaseHelper.js",
+                "CompHelper.js",
+                "LayerHelper.js",
+                "KeyFrameHelper.js"
+            ],
+            "host"     : [
+                "AETypes.js",
+                "BaseHelper.js",
+                "CompHelper.js",
+                "LayerHelper.js",
+                "KeyFrameHelper.js"
+            ],
+            "disabled" : false
         },
         {
-            "name"   :  "info",
-            "client" : ["client.js"],
-            "host"   : ["host.js"]
+            "name"     :  "hello",
+            "client"   : ["client.js"],
+            "host"     : ["host.js"],
+            "disabled" : true
+        },
+        {
+            "name"     :  "info",
+            "client"   : ["client.js"],
+            "host"     : ["host.js"],
+            "disabled" : false
         }
     ]
 }

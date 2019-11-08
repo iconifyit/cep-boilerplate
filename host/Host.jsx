@@ -26,6 +26,7 @@ var module = typeof module === 'undefined' ? {} : module;
  * Declare the target app.
  */
 
+#include "polyfills.js";
 #include "Logger.jsx";
 #include "JSON.jsx";
 #include "Utils.jsx";
@@ -58,15 +59,16 @@ var logger = new Logger(Config.get('APP_NAME'), Config.get('LOGFOLDER'));
 
 function debug(what) {
     logger.info(what);
-    // alert(what);
 }
 
 debug('Logger instance created');
 
+var Host;
+
 /**
  * Run the script using the Module patter.
  */
-var Host = (function(Config, logger) {
+module.Host = function(Config, logger) {
 
     var Instance = function(Config, logger) {
         this.logger = logger;
@@ -93,38 +95,52 @@ var Host = (function(Config, logger) {
         return response.stringify();
     };
 
-    // Add code here to dynamically load external Host plugins.
-    Instance.prototype.loadPlugins = function(pluginsPath) {
+    Instance.prototype.loadPlugins = function(path) {
 
         var config,
             plugins;
 
         try {
-            config = Utils.read_json_file(pluginsPath + '/plugins.json');
+
+            debug('Start Host.loadPlugins');
+
+            config = Utils.read_json_file(path + '/plugins.json');
+
+            debug('Host.loadPlugins - plugins config loaded (' + typeof config + ')');
+
             plugins = config.plugins;
 
-            plugins.map(function(plugin) {
-                if (! isDefined(plugin)) return;
-                if (isString(plugin.host)) {
-                    var script = plugin.host;
-                    try {
-                        $.evalFile([pluginsPath, plugin.name, script].join('/'));
-                    }
-                    catch(e) {
-                        logger.error(e + '[' + script + ']')
-                    }
-                }
-                else if (isArray(plugin.host)) {
-                    plugin.host.map(function(script) {
+            debug('Host.loadPlugins - get plugins from config (' + typeof plugins + ')');
+
+            for (var i = 0; i < plugins.length; i ++) {
+                var plugin = plugins[i];
+
+                debug('Host.loadPlugins - plugins loop (1) - ' + typeof plugin);
+
+                if (typeof plugin === 'object') {
+
+                    debug('Host.loadPlugins - loop (2) - ' + plugin.name);
+
+                    var isDisabled = typeof plugin.disabled !== 'undefined' && isTrue(plugin.disabled);
+
+                    debug('Is ' + plugin.name + ' disabled? ' + (isDisabled ? 'Yes, skipping' : 'No, continuing'));
+
+                    if (isDisabled) continue;
+
+                    debug('Host.loadPlugins - loop through host files for ' + plugin.name);
+
+                    for (var x = 0; x < plugin.host.length; x++) {
+                        var fileName = plugin.host[x];
                         try {
-                            $.evalFile([pluginsPath, plugin.name, script].join('/'));
+                            debug('Host.loadPlugins - $.evalFile - ' + fileName);
+                            $.evalFile([path, plugin.name, fileName].join('/'));
                         }
                         catch(e) {
-                            logger.error(e + '[' + script + ']');
+                            logger.error(e + '[' + fileName + ']');
                         }
-                    });
+                    }
                 }
-            });
+            }
 
             return new HostResponse('Host plugins loaded', undefined).stringify();
         }
@@ -150,7 +166,25 @@ var Host = (function(Config, logger) {
 
     return new Instance(Config, logger);
 
-})(Config, logger);
+};
+
+/**
+ * To be called from Client to create the Host instance.
+ * @returns {string}
+ */
+function createHostInstance() {
+    debug('createHostInstance called');
+    try {
+        Host = new module.Host(Config, logger);
+        if (typeof Host === 'object') {
+            return new HostResponse('Host instance was created', undefined).stringify();
+        }
+    }
+    catch(e) {
+        debug('createHostInstance error : ' + e);
+        return new HostResponse(undefined, 'createHostInstance error : ' + e).stringify();
+    }
+}
 
 /**
  * Wrappedr for CEP's evalFile.
@@ -171,7 +205,6 @@ function include(theFilePath) {
         return e;
     }
 }
-
 
 debug('Host file loaded');
 

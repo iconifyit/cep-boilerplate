@@ -127,10 +127,11 @@ var noop = function noop() {};
 function addScript(src, fn) {
     var s = document.createElement('script');
     s.setAttribute('src', src);
-    s.onload = function() {
-        console.info('Script ' + src + ' dynamically loaded');
+    s.onload = function(e) {
+        console.log('s.onload', e);
+        console.info('Script ' + src + ' added');
         if (typeof fn === 'function') {
-            fn();
+            fn.call(null, {event: e, script: s});
         }
     };
     document.body.appendChild(s);

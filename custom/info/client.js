@@ -6,7 +6,9 @@
 
     $(function() {
 
-        var $button = $("#save-button");
+        var $button = $("#info-button");
+
+        Client.enable($button);
 
         var buttonHandler = function(e) {
             e.preventDefault();
@@ -19,6 +21,8 @@
             $button.blur();
         }
 
-        $button.off('click', buttonHandler).on('click', buttonHandler);
+        $button
+            .off('click', buttonHandler)
+            .on('click', buttonHandler);
     });
 })(jQuery, Client);
