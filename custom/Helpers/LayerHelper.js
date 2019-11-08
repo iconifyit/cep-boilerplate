@@ -8,6 +8,7 @@ var LayerHelper = function(theItem) {
     var _functions = [];
 }
 
+
 extend(BaseHelper, LayerHelper);
 
 if (typeof console !== 'undefined') {

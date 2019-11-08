@@ -11,6 +11,16 @@
             ],
             "host"     : [
                 "AETypes.js",
+
+                "functions.js",
+
+                "CompItemInfo.js",
+                "LayerInfo.js",
+                "PropertyInfo.js",
+                "PropertyValueTypeString.js",
+                "PropertyValue.js",
+                "KeyFrameInfo.js",
+
                 "BaseHelper.js",
                 "CompHelper.js",
                 "LayerHelper.js",

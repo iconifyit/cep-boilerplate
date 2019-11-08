@@ -13,7 +13,7 @@ NAME=`mydirname`
 
 read -s -p 'Enter Password:' PASSWORD
 
-extension='/Library/Application Support/Adobe/CEP/extensions/bg.remove'
+extension="/Library/Application Support/Adobe/CEP/extensions/$NAME.dev"
 
 if [ -d "$extension" ]; then
     read -s -p "Are you sure you want to delete $extension ? (type yes)" CONFIRM
