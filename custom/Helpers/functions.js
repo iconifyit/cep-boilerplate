@@ -202,3 +202,21 @@ if (! (get instanceof Function)) {
         return value;
     }
 }
+
+function processProperty(theProp) {
+    var properties = [];
+    if (theProp.propertyType === PropertyType.PROPERTY) {
+        debug('theProp', theProp.name);
+        properties.push(new PropertyInfo(theProp));
+    }
+    // Must be a group
+    else {
+        for (var i = 1; i <= theProp.numProperties; i++) {
+            debug('[PropertyGroup]', theProp.name + ' is a group, recurse it');
+            properties.concat(
+                processProperty(theProp.property(i))
+            );
+        }
+    }
+    return properties;
+}
