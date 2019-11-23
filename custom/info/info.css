@@ -1,0 +1,12 @@
+/**
+ * 1. Add your custom styles here.
+ * 2. In /cep-boilerplate/custom/plugins.json add a "styles" attribute to the info plugin like the code below:
+ *        {
+ *           "name"     :  "info",
+ *           "styles"   : ["info.css"],
+ *           "client"   : ["client.js"],
+ *           "host"     : ["host.js"],
+ *           "disabled" : false
+ *       }
+ * 3. Reload the plugin.
+ */

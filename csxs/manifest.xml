@@ -9,10 +9,6 @@
     </ExtensionList>
     <ExecutionEnvironment>
         <HostList>
-            <Host Name="ILST" Version="19" />
-            <Host Name="PHXS" Version="14.0"/>
-            <Host Name="PHSP" Version="14.0"/>
-            <Host Name="IDSN" Version="9.0"/>
             <Host Name="AEFT" Version="[13.0,17.9]" Port="8093" />
             <Host Name="AEFX" Version="[13.0,17.9]" Port="8093" />
         </HostList>
@@ -20,7 +16,7 @@
             <Locale Code="All" />
         </LocaleList>
         <RequiredRuntimeList>
-            <RequiredRuntime Name="CSXS" Version="8.0" />
+            <RequiredRuntime Name="CSXS" Version="9.0" />
         </RequiredRuntimeList>
     </ExecutionEnvironment>
     <DispatchInfoList>
@@ -30,8 +26,6 @@
                     <MainPath>./client/index.html</MainPath>
                     <ScriptPath>./host/Host.jsx</ScriptPath>
                     <CEFCommandLine>
-                        <Parameter>--enable-nodejs</Parameter>
-                        <Parameter>--mixed-context</Parameter>
                     </CEFCommandLine>
                 </Resources>
                 <Lifecycle>

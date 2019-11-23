@@ -138,6 +138,24 @@ function addScript(src, fn) {
 }
 
 /**
+ * Dynamically add a script tag to a page.
+ * @param src
+ */
+function addStylesheet(src, fn) {
+    var s = document.createElement('link');
+    s.setAttribute('rel', 'stylesheet');
+    s.setAttribute('href', src);
+    s.onload = function(e) {
+        console.log('s.onload', e);
+        console.info('Stylesheet ' + src + ' added');
+        if (typeof fn === 'function') {
+            fn.call(null, {event: e, script: s});
+        }
+    };
+    document.body.appendChild(s);
+}
+
+/**
  * Queue a script to load on DOM.ready
  * @param src
  * @param fn

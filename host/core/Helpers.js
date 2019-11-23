@@ -322,6 +322,14 @@ function get( subject, key, _default ) {
     return value;
 }
 
+/*
+var props = comps[i].reflect.properties;
+for (var x = 0; x < props.length; x++) {
+    var key = props[x].name;
+    debug('[CompItem][reflect][' + key + ']', comps[i][key]);
+}
+ */
+
 /**
  * Ensures a URL ends with a trailing slash.
  * @param url

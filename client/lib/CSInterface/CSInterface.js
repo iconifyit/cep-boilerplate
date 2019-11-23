@@ -1194,7 +1194,7 @@ CSInterface.prototype.getWindowTitle = function()
 
 var csInterface = new CSInterface();
 
-if (module) {
+if (typeof module != 'undefined') {
     module.exports = csInterface;
 }
 

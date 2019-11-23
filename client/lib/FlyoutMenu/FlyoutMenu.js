@@ -132,6 +132,6 @@ function MenuDivider() {
 
 var flyoutMenu = new FlyoutMenu();
 
-if (module) {
+if (typeof module != 'undefined') {
     module.exports = flyoutMenu;
 }

@@ -14,17 +14,18 @@
 
                 "functions.js",
 
+                "bm_generalUtils.js",
+                "bm_keyframeHelper.js",
+                "BezierHelper.js",
+
                 "CompItemInfo.js",
                 "LayerInfo.js",
                 "PropertyInfo.js",
                 "PropertyValueTypeString.js",
-                "PropertyValue.js",
+                "PropertyValueCoercion.js",
                 "KeyFrameInfo.js",
-
-                "BaseHelper.js",
-                "CompHelper.js",
-                "LayerHelper.js",
-                "KeyFrameHelper.js"
+                "KeyFrameEasing.js",
+                "EasingToCubicBezier.js"
             ],
             "disabled" : false
         },
@@ -36,6 +37,7 @@
         },
         {
             "name"     :  "info",
+            "styles"   : ["info.css"],
             "client"   : ["client.js"],
             "host"     : ["host.js"],
             "disabled" : false

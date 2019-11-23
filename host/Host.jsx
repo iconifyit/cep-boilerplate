@@ -108,35 +108,31 @@ module.Host = function(Config, logger) {
 
             debug('Host.loadPlugins - plugins config loaded (' + typeof config + ')');
 
-            plugins = config.plugins;
+            if (typeof config.plugins !== 'undefined') {
+                plugins = config.plugins;
 
-            debug('Host.loadPlugins - get plugins from config (' + typeof plugins + ')');
+                debug('Host.loadPlugins - get plugins from config (' + typeof plugins + ')');
 
-            for (var i = 0; i < plugins.length; i ++) {
-                var plugin = plugins[i];
+                for (var i = 0; i < plugins.length; i ++) {
+                    var plugin = plugins[i];
 
-                debug('Host.loadPlugins - plugins loop (1) - ' + typeof plugin);
+                    if (typeof plugin === 'object') {
 
-                if (typeof plugin === 'object') {
+                        var isDisabled = typeof plugin.disabled !== 'undefined' && isTrue(plugin.disabled);
 
-                    debug('Host.loadPlugins - loop (2) - ' + plugin.name);
+                        debug('Is ' + plugin.name + ' disabled? ' + (isDisabled ? 'Yes, skipping' : 'No, continuing'));
 
-                    var isDisabled = typeof plugin.disabled !== 'undefined' && isTrue(plugin.disabled);
+                        if (isDisabled) continue;
 
-                    debug('Is ' + plugin.name + ' disabled? ' + (isDisabled ? 'Yes, skipping' : 'No, continuing'));
-
-                    if (isDisabled) continue;
-
-                    debug('Host.loadPlugins - loop through host files for ' + plugin.name);
-
-                    for (var x = 0; x < plugin.host.length; x++) {
-                        var fileName = plugin.host[x];
-                        try {
-                            debug('Host.loadPlugins - $.evalFile - ' + fileName);
-                            $.evalFile([path, plugin.name, fileName].join('/'));
-                        }
-                        catch(e) {
-                            logger.error(e + '[' + fileName + ']');
+                        for (var x = 0; x < plugin.host.length; x++) {
+                            var fileName = plugin.host[x];
+                            try {
+                                debug('Host.loadPlugins - $.evalFile - ' + fileName);
+                                $.evalFile([path, plugin.name, fileName].join('/'));
+                            }
+                            catch(e) {
+                                logger.error(e + '[' + fileName + ']');
+                            }
                         }
                     }
                 }

@@ -3,151 +3,153 @@
  */
 interface Property {
 
-    active : null;
+    active : boolean;
 
-    addKey : null;
+    addKey : Function;
 
-    addToMotionGraphicsTemplate : null;
+    addToMotionGraphicsTemplate : Function;
 
     canAddToMotionGraphicsTemplate : null;
 
-    canSetEnabled : null;
+    canSetEnabled : boolean;
 
-    canSetExpression : null;
+    canSetExpression : boolean;
 
-    canVaryOverTime : null;
+    canVaryOverTime : boolean;
 
     dimensionsSeparated : null;
 
-    duplicate : null;
+    duplicate : Function;
 
-    elided : null;
+    elided : boolean;
 
-    enabled : null;
+    enabled : boolean;
 
     expression : null;
 
-    expressionEnabled : null;
+    expressionEnabled : boolean;
 
     expressionError : null;
 
-    getSeparationFollower : null;
+    getSeparationFollower : Function;
 
-    hasMax : null;
+    hasMax : boolean;
 
-    hasMin : null;
+    hasMin : boolean;
 
-    isEffect : null;
+    isEffect : boolean;
 
-    isInterpolationTypeValid : null;
+    isInterpolationTypeValid : boolean;
 
-    isMask : null;
+    isMask : boolean;
 
-    isModified : null;
+    isModified : boolean;
 
-    isSeparationFollower : null;
+    isSeparationFollower : boolean;
 
-    isSeparationLeader : null;
+    isSeparationLeader : boolean;
 
-    isSpatial : null;
+    isSpatial : boolean;
 
-    isTimeVarying : null;
+    isTimeVarying : boolean;
 
-    keyInInterpolationType : null;
+    keyInInterpolationType : Function;
 
-    keyInSpatialTangent : null;
+    keyInSpatialTangent : Function;
 
-    keyInTemporalEase : null;
+    keyInTemporalEase : Function;
 
-    keyOutInterpolationType : null;
+    keyOutInterpolationType : Function;
 
-    keyOutSpatialTangent : null;
+    keyOutSpatialTangent : Function;
 
-    keyOutTemporalEase : null;
+    keyOutTemporalEase : Function;
 
-    keyRoving : null;
+    keyRoving : Function;
 
-    keySelected : null;
+    keySelected : Function;
 
-    keySpatialAutoBezier : null;
+    keySpatialAutoBezier : Function;
 
-    keySpatialContinuous : null;
+    keySpatialContinuous : Function;
 
-    keyTemporalAutoBezier : null;
+    keyTemporalAutoBezier : Function;
 
-    keyTemporalContinuous : null;
+    keyTemporalContinuous : Function;
 
-    keyTime : null;
+    keyTime : Function;
 
-    keyValue : null;
+    keyValue : Function;
 
-    matchName : null;
+    matchName : string;
 
-    maxValue : null;
+    maxValue : number;
 
-    minValue : null;
+    minValue : number;
 
-    moveTo : null;
+    moveTo : Function;
 
-    name : null;
+    name : string;
 
-    nearestKeyIndex : null;
+    nearestKeyIndex : Function;
 
-    numKeys : null;
+    numKeys : number;
 
     parentProperty : null;
 
-    propertyDepth : null;
+    propertyDepth : number;
 
     propertyGroup : null;
 
-    propertyIndex : null;
+    propertyIndex : number;
 
-    propertyType : null;
+    // @ts-ignore
+    propertyType : PropertyType;
 
-    propertyValueType : null;
+    // @ts-ignore
+    propertyValueType : PropertyValueType;
 
-    remove : null;
+    remove : Function;
 
-    removeKey : null;
+    removeKey : Function;
 
-    selected : null;
+    selected : boolean;
 
-    selectedKeys : null;
+    selectedKeys : [];
 
     separationDimension : null;
 
     separationLeader : null;
 
-    setInterpolationTypeAtKey : null;
+    setInterpolationTypeAtKey : Function;
 
-    setRovingAtKey : null;
+    setRovingAtKey : Function;
 
-    setSelectedAtKey : null;
+    setSelectedAtKey : Function;
 
-    setSpatialAutoBezierAtKey : null;
+    setSpatialAutoBezierAtKey : Function;
 
-    setSpatialContinuousAtKey : null;
+    setSpatialContinuousAtKey : Function;
 
-    setSpatialTangentsAtKey : null;
+    setSpatialTangentsAtKey : Function;
 
-    setTemporalAutoBezierAtKey : null;
+    setTemporalAutoBezierAtKey : Function;
 
-    setTemporalContinuousAtKey : null;
+    setTemporalContinuousAtKey : Function;
 
-    setTemporalEaseAtKey : null;
+    setTemporalEaseAtKey : Function;
 
-    setValue : null;
+    setValue : Function;
 
-    setValueAtKey : null;
+    setValueAtKey : Function;
 
-    setValueAtTime : null;
+    setValueAtTime : Function;
 
-    setValuesAtTimes : null;
+    setValuesAtTimes : Function;
 
     unitsText : null;
 
     value : null;
 
-    valueAtTime : null;
+    valueAtTime : Function;
 }

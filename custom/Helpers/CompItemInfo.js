@@ -1,28 +1,25 @@
 /**
  * Info object for CompItem
- * @param theItem
+ * @param theCompItem
  * @param index
  * @returns {{frameRate: *, name: *, width: *, layers: *, index: *, type: string, height: *}}
  * @constructor
  */
-var CompItemInfo = function(theItem, index) {
+var CompItemInfo = function(theCompItem, index) {
     try {
         return {
             type      : 'CompItem',
             index     : index,
-            id        : get(theItem, 'id',        'unknown CompItem.id'),
-            name      : get(theItem, 'name',      'name not found'),
-            frameRate : get(theItem, 'frameRate', 'frameRate not found'),
-            width     : get(theItem, 'width',     'width not found'),
-            height    : get(theItem, 'height',    'height not found'),
-            // selectedProperties : getSelectedProperties(theItem),
-            layers    : getLayerInfos(theItem, index),
-            numLayers : get(theItem, 'numLayers', 'CompItem.numLayers not found')
+            id        : get(theCompItem, 'id',        '--'),
+            name      : get(theCompItem, 'name',      '--'),
+            frameRate : get(theCompItem, 'frameRate', '--'),
+            width     : get(theCompItem, 'width',     '--'),
+            height    : get(theCompItem, 'height',    '--'),
+            layers    : getLayerInfos(theCompItem),
+            numLayers : get(theCompItem, 'numLayers', '--')
         }
     }
-    catch(e) {
-        alert('[CompItemInfo] ' + e)
-    }
+    catch(e) { debug('[ERROR][CompItemInfo]', e.message) }
 }
 
 if (typeof console !== 'undefined') {

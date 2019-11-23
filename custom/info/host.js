@@ -2,12 +2,18 @@
 // http://www.redefinery.com/ae/fundamentals/properties/
 // https://aescripts.com/compcode/
 
+var DEBUG = true;
+
 (function(Host) {
     if (typeof Host === 'undefined') {
         return new HostResponse(undefined, 'Host instance was not found but is required.').stringify();
     }
 
     Host.fn('info', function(name) {
+
+        var start, stop;
+
+        start = new Date().getTime();
 
         /**
          * Reference to Host's `this`
@@ -23,21 +29,13 @@
             items,
             module;
 
-        module = this;
+        debug('*********************************************************************************************');
+        debug('********************* START EXPORT MAIN (' + (new Date().toUTCString()) + ')********************');
+        debug('*********************************************************************************************');
 
         try {
             if (app.project !== undefined) {
                 project = app.project;
-
-                debug('[Project]', project.toString());
-
-                // if (! project.activeItem) {
-                //     return new HostResponse(undefined, 'No active item is selected').stringify();
-                // }
-                //
-                // activeItem = app.project.activeItem;
-                //
-                // module.logger.info(activeItem.toString());
 
                 if (! project.items.length) {
                     return new HostResponse(undefined, 'Project has no items').stringify();
@@ -86,36 +84,46 @@
         var compItem,
             infoItem,
             infos = [],
-            comps = getCompositions(items);
+            comps = getAllCompositions();
 
         debug('Composition count', comps.length);
 
         for (var i = 0; i < comps.length; i++) {
             try {
-
-                debug('CompItem index',   i);
-                debug('Typeof compiitem', typeof comps[i]);
-
-                var compItemInfo = new CompItemInfo(comps[i], i);
-
-                infos.push(compItemInfo);
+                infos.push( new CompItemInfo(comps[i], i) );
             }
-            catch(e) { alert('Error in compositions loop : ' + e) }
+            catch(e) { debug('[ERROR][compositions loop] ' + e) }
         }
+
+        var infoString,
+            fileName,
+            exportFilePath,
+            message;
 
         try {
 
-            var infoString = stringify(infos);
+            stop = new Date().getTime();
 
-            debug('[infos]', infoString);
+            infoString = stringify(infos);
 
-            var response = new HostResponse(infoString, undefined).stringify();
+            fileName = 'meta-export.json';
+            try {
+                fileName = app.project.file.name.replace('.aep', '.json')
+            }catch(e){}
 
-            debug('[response]', response);
+            exportFilePath = new File(Config.LOGFOLDER + '/' + fileName).absoluteURI;
 
-            fwrite(Config.LOGFOLDER + '/Untitled.json', infoString, false);
+            fwrite(exportFilePath, infoString, false);
+            fwrite(Config.LOGFOLDER + '/timer.txt', ( (stop - start) / 1000 ) + ' seconds', false);
 
-            return response;
+            message  = 'The export took ' + ((stop - start) / 1000 ) + ' seconds.';
+            message += '<br>Open Exported Settings @ ' + exportFilePath;
+
+            debug('************************************************************************************************');
+            debug('****************** END EXPORT MAIN (' + ((stop - start) / 1000 ) + ' seconds ) ******************************************');
+            debug('************************************************************************************************');
+
+            return new HostResponse(message, undefined).stringify();
         }
         catch(e) {
             return new HostResponse(undefined, 'Error creating response').stringify();

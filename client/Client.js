@@ -77,7 +77,7 @@ local.Client = ($, csInterface) => {
             if (text === "") return;
             if (strcmp(oldText, text)) return;
 
-            $message.text(text);
+            $message.append(text);
             $message.show();
 
             console.log(text);
@@ -263,6 +263,11 @@ local.Client = ($, csInterface) => {
         });
     }
 
+    /**
+     * Parse plugin config file and return plugins list.
+     * @param theFilePath
+     * @returns {Array|PluginArray|HTMLCollectionOf<HTMLEmbedElement>}
+     */
     Instance.prototype.getPlugins = function(theFilePath) {
         console.log('Call Instance.prototype.getPlugins');
         var result = window.cep.fs.readFile(theFilePath);
@@ -303,19 +308,36 @@ local.Client = ($, csInterface) => {
             plugins.map(function(plugin) {
                 if (! isDefined(plugin)) return;
                 if (isTrue(plugin.disabled)) return;
-                plugin.client.map(function(script) {
-                    try {
-                        console.log([pluginsPath, plugin.name, script].join('/'));
-                        addScript([pluginsPath, plugin.name, script].join('/'), function() {
-                            console.log([pluginsPath, plugin.name, script].join('/') + ' added');
-                        });
-                        module.plugins.push(plugin.name);
-                    }
-                    catch(e) {
-                        error(e + '[' + script + ']');
-                    }
-                });
 
+                if (typeof plugin.client !== 'undefined') {
+                    plugin.client.map(function(script) {
+                        try {
+                            console.log([pluginsPath, plugin.name, script].join('/'));
+                            addScript([pluginsPath, plugin.name, script].join('/'), function() {
+                                console.log([pluginsPath, plugin.name, script].join('/') + ' added');
+                            });
+                            module.plugins.push(plugin.name);
+                        }
+                        catch(e) {
+                            error(e + '[' + script + ']');
+                        }
+                    });
+                }
+
+                if (typeof plugin.styles !== 'undefined') {
+                    plugin.styles.map(function(stylesheet) {
+                        try {
+                            console.log([pluginsPath, plugin.name, stylesheet].join('/'));
+                            addStylesheet([pluginsPath, plugin.name, stylesheet].join('/'), function() {
+                                console.log([pluginsPath, plugin.name, stylesheet].join('/') + ' added');
+                            });
+                            module.plugins.push(plugin.name);
+                        }
+                        catch(e) {
+                            error(e + '[' + stylesheet + ']');
+                        }
+                    });
+                }
             });
 
             console.info('Client.plugins', this.plugins);
@@ -445,7 +467,7 @@ local.Client = ($, csInterface) => {
                     break;
             }
         }
-        catch(e) { alert(e) }
+        catch(e) { console.error(e) }
     }
 
     /**
@@ -494,21 +516,25 @@ local.Client = ($, csInterface) => {
     try {
         instance = new Instance();
     }
-    catch(e) { alert(1) }
+    catch(e) { console.error(e + '[1]') }
 
     try {
         instance.init();
     }
-    catch(e) { alert(2) }
+    catch(e) { console.error(e + '[2]') }
 
     try {
         instance.initFlyoutMenu();
     }
-    catch(e) { alert(3) }
+    catch(e) { console.error(e + '[3]') }
 
 
     return instance;
 
+}
+
+function openFile(filepath) {
+    csInterface.openURLInDefaultBrowser(filepath);
 }
 
 /**

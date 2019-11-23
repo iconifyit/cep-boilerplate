@@ -1,33 +1,21 @@
 /**
  * Info item for Layer
- * @param {Layer}   theItem
- * @param {int}     index
+ * @param   {Layer}       theLayer        The current Layer being processed.
+ * @param   {int}         index           The index of the current Layer in the Layers array.
+ * @param   {CompItem}    theCompItem     The current CompItem being processed.
  * @returns {{name: *, index: *, type: string}}
  * @constructor
  */
-var LayerInfo = function(theItem, index) {
+var LayerInfo = function(theLayer, index, theCompItem) {
     try {
-        var properties    = [],
-            numProperties = get(theItem, 'numProperties', 0);
-
-        if (numProperties) {
-            for (var i = 1; i <= numProperties; i++) {
-                // processProperty(theItem)
-                // properties.concat([], processProperty(theItem));
-                properties.push(
-                    new PropertyInfo(theItem.property(i), i)
-                );
-            }
-        }
-
         return {
             type          : 'Layer',
             index         : index,
-            id            : get(theItem, 'id',   'unknown Layer.id'),
-            name          : get(theItem, 'name', 'layer name not found'),
-            numProperties : numProperties,
-            properties    : properties
+            name          : get(theLayer, 'name', '--'),
+            matchName     : get(theLayer, 'matchName', '--'),
+            numProperties : get(theLayer, 'numProperties', 0),
+            properties    : processLayerProperties(theLayer, theCompItem)
         }
     }
-    catch(e) { alert('[LayerInfo] ' + e) }
+    catch(e) { debug('[ERROR][LayerInfo][main body] ' + e) }
 }
