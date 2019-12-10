@@ -6,9 +6,15 @@ var DEBUG = true;
 
 (function(Host) {
     if (typeof Host === 'undefined') {
-        return new HostResponse(undefined, 'Host instance was not found but is required.').stringify();
+        return new HostResponse(
+            undefined,
+            'Host instance was not found but is required.'
+        ).stringify();
     }
 
+    /*
+     * Attach the plugin's method.
+     */
     Host.fn('info', function(name) {
 
         var start, stop;

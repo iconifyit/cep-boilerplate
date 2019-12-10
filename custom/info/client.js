@@ -10,7 +10,7 @@
 
         Client.enable($button);
 
-        var buttonHandler = function(e) {
+        var clickHandler = function(e) {
             e.preventDefault();
             e.stopPropagation();
 
@@ -22,7 +22,7 @@
         }
 
         $button
-            .off('click', buttonHandler)
-            .on('click', buttonHandler);
+            .off('click', clickHandler)
+            .on('click', clickHandler);
     });
 })(jQuery, Client);

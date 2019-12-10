@@ -4,28 +4,11 @@
             "name"     :  "Helpers",
             "client"   : [
                 "AETypes.js",
-                "BaseHelper.js",
-                "CompHelper.js",
-                "LayerHelper.js",
-                "KeyFrameHelper.js"
+                "BaseHelper.js"
             ],
             "host"     : [
-                "AETypes.js",
-
-                "functions.js",
-
-                "bm_generalUtils.js",
-                "bm_keyframeHelper.js",
-                "BezierHelper.js",
-
-                "CompItemInfo.js",
-                "LayerInfo.js",
-                "PropertyInfo.js",
-                "PropertyValueTypeString.js",
-                "PropertyValueCoercion.js",
-                "KeyFrameInfo.js",
-                "KeyFrameEasing.js",
-                "EasingToCubicBezier.js"
+                "math.js",
+                "functions.global.js"
             ],
             "disabled" : false
         },
@@ -40,7 +23,13 @@
             "styles"   : ["info.css"],
             "client"   : ["client.js"],
             "host"     : ["host.js"],
-            "disabled" : false
+            "disabled" : true
+        },
+        {
+          "name"     :  "server",
+          "client"   : ["client.js"],
+          "host"     : ["host.js"],
+          "disabled" : false
         }
     ]
 }

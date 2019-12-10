@@ -1,0 +1,32 @@
+{
+  "name": "cep-boilerplate",
+  "version": "1.0.0",
+  "description": "Adobe Creative Cloud CEP extension boilterplate/framework.",
+  "main": "gulpfile.js",
+  "directories": {
+    "example": "examples",
+    "lib": "lib",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iconifyit/cep-boilerplate.git"
+  },
+  "author": "scott <scott@atomiclotus.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iconifyit/cep-boilerplate/issues"
+  },
+  "homepage": "https://github.com/iconifyit/cep-boilerplate#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "http": "0.0.0",
+    "path": "^0.12.7",
+    "request": "^2.88.0"
+  }
+}

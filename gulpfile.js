@@ -69,7 +69,7 @@ function getClientScripts() {
         'host/Helpers.jsx',
         'client/lib/FlyoutMenu.js',
         'client/lib/AccountDetails.js',
-        'client/lib/functions.js'
+        'client/lib/functions.AE.js'
     ];
 }
 

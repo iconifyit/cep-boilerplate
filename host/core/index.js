@@ -1,5 +1,5 @@
 #include "Observable.js";
-#include "functions.js";
+#include "functions.AE.js";
 #include "Stream.js";
 #include "Logger.js";
 #include "Base.js";
@@ -14,3 +14,4 @@
 #include "Dialog.jsx";
 #include "Utils.js";
 #include "Model.js";
+#include "SocketClient.js";
