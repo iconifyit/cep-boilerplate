@@ -34,7 +34,7 @@
             "name"     :  "iconjar",
             "client"   : ["client.js"],
             "host"     : ["host.js"],
-            "disabled" : false
+            "disabled" : true
         }
     ]
 }

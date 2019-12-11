@@ -6,7 +6,9 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <ExtensionList>
         <Extension Id="com.atomic.cep-boilerplate.panel" Version="1.0.0" />
-        <Extension Id="com.atomic.cep-boilerplate.server" Version="1.0.0" />
+        <!--
+         <Extension Id="com.atomic.cep-boilerplate.server" Version="1.0.0" />
+         -->
     </ExtensionList>
     <ExecutionEnvironment>
         <HostList>
@@ -58,38 +60,6 @@
                 </UI>
             </DispatchInfo>
         </Extension>
-        <Extension Id="com.atomic.cep-boilerplate.server">
-            <DispatchInfo>
-                <Resources>
-                    <MainPath>./client/server.html</MainPath>
-                    <CEFCommandLine>
-                        <Parameter>--enable-nodejs</Parameter>
-                        <Parameter>--mixed-context</Parameter>
-                    </CEFCommandLine>
-                </Resources>
-                <Lifecycle>
-                    <AutoVisible>true</AutoVisible>
-                </Lifecycle>
-                <UI>
-                    <Type>Panel</Type>
-                    <Menu>Boilerplate Server</Menu>
-                    <Geometry>
-                        <Size>
-                            <Height>250</Height>
-                            <Width>350</Width>
-                        </Size>
-                        <MaxSize>
-                            <Height>250</Height>
-                            <Width>350</Width>
-                        </MaxSize>
-                        <MinSize>
-                            <Height>250</Height>
-                            <Width>350</Width>
-                        </MinSize>
-                    </Geometry>
-                    <Icons />
-                </UI>
-            </DispatchInfo>
-        </Extension>
+        
     </DispatchInfoList>
 </ExtensionManifest>
