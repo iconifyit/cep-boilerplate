@@ -3,7 +3,6 @@
         {
             "name"     :  "Helpers",
             "client"   : [
-                "AETypes.js",
                 "BaseHelper.js"
             ],
             "host"     : [
@@ -30,6 +29,12 @@
           "client"   : ["client.js"],
           "host"     : ["host.js"],
           "disabled" : false
+        },
+        {
+            "name"     :  "iconjar",
+            "client"   : ["client.js"],
+            "host"     : ["host.js"],
+            "disabled" : false
         }
     ]
 }

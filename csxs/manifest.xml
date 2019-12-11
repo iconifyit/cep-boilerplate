@@ -68,10 +68,25 @@
                     </CEFCommandLine>
                 </Resources>
                 <Lifecycle>
-                    <AutoVisible>false</AutoVisible>
+                    <AutoVisible>true</AutoVisible>
                 </Lifecycle>
                 <UI>
-                    <Type>Custom</Type>
+                    <Type>Panel</Type>
+                    <Menu>Boilerplate Server</Menu>
+                    <Geometry>
+                        <Size>
+                            <Height>250</Height>
+                            <Width>350</Width>
+                        </Size>
+                        <MaxSize>
+                            <Height>250</Height>
+                            <Width>350</Width>
+                        </MaxSize>
+                        <MinSize>
+                            <Height>250</Height>
+                            <Width>350</Width>
+                        </MinSize>
+                    </Geometry>
                     <Icons />
                 </UI>
             </DispatchInfo>

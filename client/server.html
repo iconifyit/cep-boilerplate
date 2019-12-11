@@ -2,12 +2,111 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script>
-            /* This script uses cep_node to start the Node.js server located at '/server/main.js' */
-            var localServer = cep_node.require(__dirname + '/server/main.js')();
-        </script>
+        <!-- Topcoat -->
+        <link rel="stylesheet" type="text/css" href="theme/font/stylesheet.css">
+        <link rel="stylesheet" type="text/css" href="theme/css/topcoat-desktop-dark.css">
+        <link rel="stylesheet" type="text/css" href="theme/css/main.css">
+        <link rel="stylesheet" type="text/css" href="theme/css/brackets.css">
+        <!-- /Topcoat -->
+        <link rel="stylesheet" href="theme/style.css">
+
+        <script src="lib/CSInterface/CSInterface.js"></script>
+        <script src="lib/jQuery/jquery.3.3.1.min.js"></script>
+        <script src="../host/core/Helpers.js"></script>
+        <script src="../host/core/functions.js"></script>
+        <script src="lib/FlyoutMenu/FlyoutMenu.js"></script>
+
         <title>Import Example App</title>
+        <style>
+            body { background : #fff; }
+            #status {
+                padding: 30px;
+                margin : 0px auto;
+            }
+        </style>
+
+        <script>
+            var server,
+                port = 3201,
+                host = "localhost";
+        </script>
     </head>
     <body>
+        <div id="status"></div>
+        <div class="buttons">
+            <button id="start-server" class="topcoat-button--large--cta">Start Server</button>
+            <button id="stop-server" class="topcoat-button--large--cta">Stop Server</button>
+        </div>
+
+        <script>
+            var csInterface = new CSInterface();
+            /*
+             * Add flyout menu
+             */
+            var flyoutMenu = new FlyoutMenu();
+            flyoutMenu.add('reloadExtension',   'Reload Extension', true, false, false);
+            flyoutMenu.setHandler(function(e) {
+                flyoutMenuClickedHandler(e);
+            });
+            flyoutMenu.build();
+
+            /**
+             * Flyout menu click handler.
+             * @param event
+             */
+            function flyoutMenuClickedHandler(event) {
+                try {
+
+                    var menuId = event.data.menuId;
+
+                    console.log(menuId + ' clicked', 'info');
+
+                    switch (menuId) {
+                        case "reloadExtension":
+                            reloadPanel();
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                catch(e) { console.error(e) }
+            }
+
+            /**
+             * Reload the index.html
+             */
+            function reloadPanel() {
+                try {
+                    window.cep.process.removeAllListeners();
+                    window.location.href = "server.html";
+                }
+                catch (e) {
+                    window.location.href = "server.html";
+                }
+            }
+        </script>
+
+        <script>
+            var $doc   = window.document,
+                $start = $doc.getElementById('start-server'),
+                $stop  = $doc.getElementById('stop-server');
+
+            /* This script uses cep_node to start the Node.js server located at '/server/main.js' */
+            try {
+                var localServer = cep_node.require(__dirname + '/server/main.js')();
+                console.log(server);
+                console.log('localServer : ' + typeof localServer);
+            }
+            catch(e) {
+                if (server !== undefined) {
+                    server.shutdown(function() {
+                        console.log('Shutting down server');
+                        console.error(e);
+                    })
+                }
+            }
+
+        </script>
     </body>
 </html>

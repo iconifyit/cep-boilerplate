@@ -30,7 +30,6 @@ var module = typeof module === 'undefined' ? {} : module;
 #include "Logger.jsx";
 #include "JSON.jsx";
 #include "Utils.jsx";
-// #include "core/functions.AE.js";
 #include "core/Helpers.js";
 #include "Configuration.jsx";
 #include "HostResponse.js";

@@ -115,7 +115,7 @@ Utils.extend = function(target, source) {
  */
 Utils.chooseFile = function(oFile, title, file_filter) {
     if (! oFile instanceof File) var oFile = new File();
-    if (! title) var title  = LANG.CHOOSE_FILE;
+    if (! title) var title  = 'Choose File';
     if (! filter) var filter = "*";
     return oFile.openDlg(
         title,
@@ -123,6 +123,16 @@ Utils.chooseFile = function(oFile, title, file_filter) {
         false
     );
 };
+
+/**
+ * Open a folder select dialog.
+ * @param label
+ * @param start
+ * @returns {*}
+ */
+Utils.chooseFolder = function(label, start) {
+    return Folder.selectDialog(label);
+}
 
 /**
  * Gets the screen dimensions and bounds.
