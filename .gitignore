@@ -1,0 +1,59 @@
+# dependencies
+node_modules
+server/node_module
+*node_modules*
+
+# production
+/build
+/dist
+/@dist*
+.backups
+  
+# misc
+package-lock.json
+package.json.bak
+.DS_Store
+
+# config file
+.vscode
+.env
+env
+.env.*
+.env-*
+!env-example
+.npmrc
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log* 
+
+# scaffold
+scaffold/logs
+scaffold/node_modules
+
+# bak
+bak
+
+swagger-output.json
+
+scratch*
+tmp*
+
+sbom.json
+
+# cdk output
+**/cdk.out
+
+# Refs
+refs/*
+scratch/*
+scratch-*
+scratch.*
+tmp/*
+tests-deprecated-do-not-use/*
+
+# bak
+*-bak*
+
+secrets.json

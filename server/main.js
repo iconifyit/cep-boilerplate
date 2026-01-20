@@ -1,49 +1,67 @@
 /* npm Modules */
-const express    = require("express"),
-      request    = require('request'),
-      http       = require('http'),
-      path       = require("path"),
-      bodyParser = require("body-parser"),
-      fs         = require('fs');
+const express    = require("express");
+const axios      = require("axios");
+const http       = require("http");
+const path       = require("path");
+const bodyParser = require("body-parser");
+const fs         = require("fs");
 
 const app        = express();
 const httpServer = http.Server(app);
 
-module.exports = run
+module.exports = run;
 
-function run(){
-    var port = 3200;
-    var hostname = "localhost"
+function run() {
+    const port     = 3200;
+    const hostname = "localhost";
 
     /* Start the server */
     httpServer.listen(port);
 
     /* Middlewares */
     app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ limit: '50mb',extended: true }));
+    app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
     app.use(express.static(path.join(__dirname, "../client")));
 
     /* /import route that can be hit from the client side */
-    app.get("/import", (req, res, next) => {
+    app.get("/import", async (req, res) => {
 
-        /* Get the directory path from the header and name the file */
-        var path = req.headers["directory"] + "/placeholder.png"
+        try {
+            /* Get the directory path from the header and name the file */
+            const filePath = path.join(req.headers["directory"], "placeholder.png");
 
-        /* This is an example URL */
-        var uri = "http://via.placeholder.com/350x150";
+            /* Example URL */
+            const uri = "http://via.placeholder.com/350x150";
 
-        /* write a helper function to download the image and save it */
-        var saveImage = function(uri, filepath, callback){
-            request.head(uri, function(err, res, body){
-                request(uri).pipe(fs.createWriteStream(filepath)).on('close', callback);
-            });
-        };
+            /* Download and save image */
+            await saveImage(uri, filePath);
 
-        saveImage(uri, path, function(){
-            /* Send the path back to the client side */
-            res.status(200).send(path)
-        });
-
-
+            /* Send the path back to the client */
+            res.status(200).send(filePath);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).send("Failed to import image");
+        }
     });
 }
+
+/**
+ * Download an image and save it to disk
+ */
+const saveImage = async (uri, filePath) => {
+    const response = await axios({
+        method       : 'get',
+        url          : uri,
+        responseType : 'stream',
+    });
+
+    return new Promise((resolve, reject) => {
+        const writer = fs.createWriteStream(filePath);
+
+        response.data.pipe(writer);
+
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+    });
+};

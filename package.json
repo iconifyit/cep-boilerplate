@@ -22,11 +22,10 @@
   },
   "homepage": "https://github.com/iconifyit/cep-boilerplate#readme",
   "dependencies": {
+    "axios": "^1.13.2",
     "body-parser": "^2.2.1",
     "express": "^5.2.1",
-    "fs": "0.0.1-security",
     "http": "^0.0.1-security",
-    "path": "^0.12.7",
-    "request": "^2.88.0"
+    "path": "^0.12.7"
   }
 }
