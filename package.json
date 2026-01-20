@@ -1,31 +1,31 @@
 {
-  "name": "cep-boilerplate",
-  "version": "1.0.0",
-  "description": "Adobe Creative Cloud CEP extension boilterplate/framework.",
-  "main": "gulpfile.js",
-  "directories": {
-    "example": "examples",
-    "lib": "lib",
-    "test": "tests"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/iconifyit/cep-boilerplate.git"
-  },
-  "author": "scott <scott@atomiclotus.net>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/iconifyit/cep-boilerplate/issues"
-  },
-  "homepage": "https://github.com/iconifyit/cep-boilerplate#readme",
-  "dependencies": {
-    "axios": "^1.13.2",
-    "body-parser": "^2.2.1",
-    "express": "^5.2.1",
-    "http": "^0.0.1-security",
-    "path": "^0.12.7"
-  }
+    "name": "cep-boilerplate",
+    "version": "1.0.0",
+    "description": "Adobe Creative Cloud CEP extension boilterplate/framework.",
+    "main": "gulpfile.js",
+    "directories": {
+        "example": "examples",
+        "lib": "lib",
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/iconifyit/cep-boilerplate.git"
+    },
+    "author": "scott <scott@atomiclotus.net>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/iconifyit/cep-boilerplate/issues"
+    },
+    "homepage": "https://github.com/iconifyit/cep-boilerplate#readme",
+    "dependencies": {
+        "axios": "^1.13.2",
+        "body-parser": "^2.2.1",
+        "express": "^5.2.1",
+        "http": "^0.0.1-security",
+        "path": "^0.12.7"
+    }
 }
